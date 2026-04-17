@@ -3,3 +3,12 @@ Gloria Kao, Mahir Oza, Ali Karim, Michael Nodini
 
 ## Abstract
 Online forums like Reddit are often interested in identifying trends and patterns in user behavior to suggest uniquely curated topics of interest or channels to collaborate and discuss. This dataset is found on Kaggle and sourced from multiple Reddit subreddits (i.e. forums of different topics), and contains Reddit submission posts ranging from July 2021 to February 2023, totaling over 130GB of data, with each month provided as its own CSV file. Since this dataset contains NSFW topics (labeled as “over 18”), our project will analyze a subset of the dataset, produced during the data cleaning section by removing inappropriate topics. Nonetheless, the expected dataset size following our cleaning pipeline will still be over 50GB, requiring a high level of computing power that cannot be done by any normal consumer machine. Thus, we need to use distributed computing to load and work with the full dataset. Such a method provides cheap efficiency and makes the large dataset scalable for our project to work in a faster environment. Since much of the dataset is text-based, our research will focus on Natural Language Processing (NLP) to conduct Sentiment Analysis by different categories of subreddit (e.g. most/least positive subreddits), and Subreddit Prediction to train a classification model to predict the most suitable subreddit from unseen Reddit posts. The expected analysis would be useful for Reddit in cases that may involve moderation of subreddits or subreddit suggestions for users who may not know where to post.
+
+## Datasets
+“Reddit Submissions July 2021 to Oct 2022” from Kaggle : https://www.kaggle.com/datasets/noahpersaud/reddit-submissions-july-2021-to-oct-2022 
+“Reddit Submissions Dec 2022 to Feb 2023” from Kaggle : https://www.kaggle.com/datasets/noahpersaud/reddit-submissions-dec-2022-to-feb-2023 
+
+## SDSC Expanse Environment Setup
+At least 8 cores and at least 10GB per node.
+
+## Data Exploration Using Spark
