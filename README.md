@@ -79,10 +79,11 @@ Since this dataset contains thousands of different subreddits, it becomes clear 
 Unfortunately, a good portion of this dataset contains NSFW content, highlighted by the over_18 feature, the first step in cleaning and transforming our data into a format we feel comfortable working with for this project is to drop any posts from our dataset that have a TRUE boolean value for this column. This should not only drop a good portion of rows, many of which contain few, distinct, unique subreddits, but will also make our dataset much more scalable as we move forward with our modeling plan. While we acknowledge these subreddits are important to deterministic aspects to reddits business model, from an academic and comfrtability standpoint this is the most appropriate path forward for our group. We will also be leveraging transformation encodings such as TF-IDF, One-Hot Encoding (OHE), or Word2Vec methods. This will be necessary for the NLP techniques we plan to implement in order to process the thousands of text-based post features we are utilizing so that our model can predict subreddits accurately. We will apply sentiment analysis to each of the self_text rows, to then group all sentiment scores (on a scale from -1 for most negative to +1 for most positive) according to sub-reddit. This will provide us a way to see which 5 subreddits have the most positive or negative sentiment.
 
 **Spark Operations for Preprocessing:**
-'''python
+
+```python
 df.count() # Number of Entries: 654221435\
 df.describe().show(5)\
 df.groupBy(subreddit').count()\
 df = df.where("is_18 = false")\
 df.select("subreddit").distinct().count() # Unique Subreddits: 6857314
-'''
+```
