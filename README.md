@@ -19,19 +19,19 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder \
     .config("spark.driver.memory", "2g") \
     .config("spark.executor.memory", "8g") \
-    .config('spark.executor.instances', 8) \
+    .config('spark.executor.instances', 15) \
     .appName("KaggleData") \
     .getOrCreate()
 ```
-With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 8GB.
+With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 8GB (130GB/15 executors).
 
 *justification (2b); note: executor instances = Total Cores - 1 & Executor Memory = (Total Memory - Driver Memory)/Executor Instances*
 
-*screenshot of SparkUI showing active executors*
+**Screenshot of SparkUI Showing Active Executors:**
 
 ## Data Exploration Using Spark
 
-**Number of Observations in Raw Dataset: n**
+**Number of Observations in Raw Dataset: 654,221,435**
 
 **Columns (Scales, Distributions, Categorical/Continuous Type, & Feature/Target) of Dataset:**
 
@@ -45,7 +45,8 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 |self_text | Primary body that makes up the forum post | string | any sequence of characters of any length | categorical | feature |
 
 **Missing/Duplicate Values Within Dataset:**
-This data does contain missing values that are primarily seen in features for link_flair_text and self_text. Additionally, self_text contains text like '[deleted]' or '[removed]' which we will consider as missing data.
+This data does contain missing values that are primarily seen in features for link_flair_text and self_text. Additionally, self_text contains text like '[deleted]' or '[removed]' which we will consider as missing data. We do see duplicate data for the subreddits, but since this is both expected and desired, where we would expect the dataset to include multiple posts for likely the same forum, we will not be dropping or handling any duplicates in the subreddit target column. The only feature to worry about having duplicates would be the post_id since this is a unique identifier for each post made. If there are any duplicte post id's our plan to handle it would be to test and see if the each duplicate instance is all the same for all 6 columns. If it is, then we will keep only one instance and drop the rest; if it is not, we will drop every instance of the duplicate post_id.
+
 *Note: Dataset contains no image data - completely text based*
 
 ## Data Plots
