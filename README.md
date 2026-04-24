@@ -18,16 +18,18 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession.builder \
     .config("spark.driver.memory", "2g") \
-    .config("spark.executor.memory", "8g") \
+    .config("spark.executor.memory", "10g") \
     .config('spark.executor.instances', 15) \
     .appName("KaggleData") \
     .getOrCreate()
 ```
-With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 8GB (130GB/15 executors).
+With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 10GB (130GB/15 executors).
 
 *justification (2b); note: executor instances = Total Cores - 1 & Executor Memory = (Total Memory - Driver Memory)/Executor Instances*
 
 **Screenshot of SparkUI Showing Active Executors:**
+<img width="715" height="107" alt="image" src="https://github.com/user-attachments/assets/2dd277dc-4817-4459-a5f8-da4be6c83dc7" />
+
 
 ## Data Exploration Using Spark
 
@@ -58,13 +60,13 @@ This data does contain missing values that are primarily seen in features for li
 ## Preprocessing Plan
 
 **Handling Missing Values:**
-Since the primary feature we will be looking at to determine subreddit is the post title ('title') and the post itself ('self_text'), any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment score's in predicting the subreddit, so making predictions with missing data in these columns would cause the model to be unable to make subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets since it would not be possible to predict and compare on a post missing the target variable, subreddit. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
+The primary feature we will be looking at to determine subreddit is the post title ('title') and the post itself ('self_text') so any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment score's in predicting the subreddit, so making predictions with missing data in these columns would cause the model to be unable to make subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets since it would not be possible to predict and compare on a post missing the target variable, subreddit. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
 
 **Data Imbalance:**
 Since this dataset contains thousands of different subreddits, it becomes clear that some of these forums appear very few times (many only once) while other subreddits are seen much more frequently. When training our models to predict subreddits for posts, many subreddits will have multiple posts to train up on compared to other subreddits which would have few to likely no subreddits to train up on. This means that when running our prediction on a validation/test set, those subreddits that the model had multiple entries to train on are going to be easier to predict while there will be many subreddits that the model has not seen and will struggle to accurately predict leading to this imbalance within the feature set of our data. To ensure fairness to different subreddits, we will be dropping any subreddits that have fewer than 10 occurrences within the overall dataset so that we can expect our model to be able to train up on the subreddits it would expect to see from the validation/test sets.
 
 **Data Transformations (Scaling, Encoding, Feature Engineering):**
-Since a good portion of this dataset contains NSFW content, highlighted by the over_18 feature, the first step in cleaning and transforming our data into a format we feel comfortable working with for this project is to drop any posts from our dataset that have a TRUE boolean value for this column. This should not only drop a good portion of rows, many of which contain few, distinct, unique subreddits, but will also make our dataset much more scalable as we move forward with our modeling plan. While we acknowledge these subreddits are important to deterministic aspects to reddits business model, from an academic and comfrtability standpoint this is the most appropriate path forward for our group. We will also be leveraging transformation encodings such as TF-IDF, One-Hot Encoding (OHE), or Word2Vec methods. This will be necessary for the NLP techniques we plan to implement in order to process the thousands of text-based post features we are utilizing so that our model can predict subreddits accurately. We will apply sentiment analysis to each of the self_text rows, to then group all sentiment scores (on a scale from -1 for most negative to +1 for most positive) according to sub-reddit. This will provide us a way to see which 5 subreddits have the most positive or negative sentiment.
+Unfortunately, a good portion of this dataset contains NSFW content, highlighted by the over_18 feature, the first step in cleaning and transforming our data into a format we feel comfortable working with for this project is to drop any posts from our dataset that have a TRUE boolean value for this column. This should not only drop a good portion of rows, many of which contain few, distinct, unique subreddits, but will also make our dataset much more scalable as we move forward with our modeling plan. While we acknowledge these subreddits are important to deterministic aspects to reddits business model, from an academic and comfrtability standpoint this is the most appropriate path forward for our group. We will also be leveraging transformation encodings such as TF-IDF, One-Hot Encoding (OHE), or Word2Vec methods. This will be necessary for the NLP techniques we plan to implement in order to process the thousands of text-based post features we are utilizing so that our model can predict subreddits accurately. We will apply sentiment analysis to each of the self_text rows, to then group all sentiment scores (on a scale from -1 for most negative to +1 for most positive) according to sub-reddit. This will provide us a way to see which 5 subreddits have the most positive or negative sentiment.
 
 **Spark Operations for Preprocessing:**
 
