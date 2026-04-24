@@ -39,10 +39,10 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 |---|---|---|---|---|---|
 | title | Provides the naming of the post made by some reddit user | string/text-based naming | any sequence of characters of any length | categorical | feature |
 | post_id | Links unique identifier to each post entry made by users on site | string | distinct 6-digit code | categorical | feature |
-| over_18 | - | - | - | - | - |
-| subreddit | - | - | - | - | - |
-| link_flair_text | - | - | - | - | - |
-|self_text | - | - | - | - | - |
+| over_18 | Boolean identifier to flag if a post/subreddit is NSFW (TRUE) or SFW and appropriate (FALSE) | Boolean | True or False | categorical (binary) | feature |
+| subreddit | Title descriptor for forum on which users can communicate, hold discussions, and interact | string | any sequency of characters of any length | categorical | target |
+| link_flair_text | - | - | - | - | feature |
+|self_text | - | - | - | - | feature |
 
 **Missing/Duplicate Values Within Dataset:**
 This data does contain missing values that are primarily seen in features for link_flair_text and self_text. 
