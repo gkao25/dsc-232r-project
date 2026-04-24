@@ -49,6 +49,13 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 **Missing/Duplicate Values Within Dataset:**
 This data does contain missing values that are primarily seen in features for link_flair_text and self_text. Additionally, self_text contains text like '[deleted]' or '[removed]' which we will consider as missing data. We do see duplicate data for the subreddits, but since this is both expected and desired, where we would expect the dataset to include multiple posts for likely the same forum, we will not be dropping or handling any duplicates in the subreddit target column. The only feature to worry about having duplicates would be the post_id since this is a unique identifier for each post made. If there are any duplicte post id's our plan to handle it would be to test and see if the each duplicate instance is all the same for all 6 columns. If it is, then we will keep only one instance and drop the rest; if it is not, we will drop every instance of the duplicate post_id.
 
+Null and empty values count:
++-----+-------+-------+---------+---------------+---------+
+|title|post_id|over_18|subreddit|link_flair_text|self_text|
++-----+-------+-------+---------+---------------+---------+
+|  336|  17933|  20405|    21505|      425449504|345790643|
++-----+-------+-------+---------+---------------+---------+
+
 *Note: Dataset contains no image data - completely text based*
 
 ## Data Plots
@@ -71,3 +78,8 @@ Unfortunately, a good portion of this dataset contains NSFW content, highlighted
 **Spark Operations for Preprocessing:**
 
 df = df.where("is_18 = false")
+
+# see number of unique subreddits
+df.select("subreddit").distinct().count()
+
+Unique Subreddits: 6857314
