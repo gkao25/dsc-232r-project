@@ -25,7 +25,8 @@ spark = SparkSession.builder \
 ```
 With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 10GB (130GB/15 executors).
 
-*justification (2b); note: executor instances = Total Cores - 1 & Executor Memory = (Total Memory - Driver Memory)/Executor Instances*
+- Executor instances = Total Cores - 1 = 15
+- Executor Memory = (Total Memory - Driver Memory) / Executor Instances = (132-2) / 15 = 8.67
 
 **Screenshot of SparkUI Showing Active Executors:**
 <img width="715" height="107" alt="image" src="https://github.com/user-attachments/assets/2dd277dc-4817-4459-a5f8-da4be6c83dc7" />
@@ -49,7 +50,7 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 **Missing/Duplicate Values Within Dataset:**
 This data does contain missing values that are primarily seen in features for link_flair_text and self_text. Additionally, self_text contains text like '[deleted]' or '[removed]' which we will consider as missing data. We do see duplicate data for the subreddits, but since this is both expected and desired, where we would expect the dataset to include multiple posts for likely the same forum, we will not be dropping or handling any duplicates in the subreddit target column. The only feature to worry about having duplicates would be the post_id since this is a unique identifier for each post made. If there are any duplicte post id's our plan to handle it would be to test and see if the each duplicate instance is all the same for all 6 columns. If it is, then we will keep only one instance and drop the rest; if it is not, we will drop every instance of the duplicate post_id.
 
-Null and empty values count:
+**Null and empty values count:**
 | Column           | Missing Count |
 |------------------|--------------|
 | title            | 336          |
@@ -79,10 +80,11 @@ Since this dataset contains thousands of different subreddits, it becomes clear 
 Unfortunately, a good portion of this dataset contains NSFW content, highlighted by the over_18 feature, the first step in cleaning and transforming our data into a format we feel comfortable working with for this project is to drop any posts from our dataset that have a TRUE boolean value for this column. This should not only drop a good portion of rows, many of which contain few, distinct, unique subreddits, but will also make our dataset much more scalable as we move forward with our modeling plan. While we acknowledge these subreddits are important to deterministic aspects to reddits business model, from an academic and comfrtability standpoint this is the most appropriate path forward for our group. We will also be leveraging transformation encodings such as TF-IDF, One-Hot Encoding (OHE), or Word2Vec methods. This will be necessary for the NLP techniques we plan to implement in order to process the thousands of text-based post features we are utilizing so that our model can predict subreddits accurately. We will apply sentiment analysis to each of the self_text rows, to then group all sentiment scores (on a scale from -1 for most negative to +1 for most positive) according to sub-reddit. This will provide us a way to see which 5 subreddits have the most positive or negative sentiment.
 
 **Spark Operations for Preprocessing:**
-'''python
-df.count() # Number of Entries: 654221435\
-df.describe().show(5)\
-df.groupBy(subreddit').count()\
-df = df.where("is_18 = false")\
+
+```python
+df.count() # Number of Entries: 654221435
 df.select("subreddit").distinct().count() # Unique Subreddits: 6857314
-'''
+
+# get subset of entries that are under 18 
+df = df.where("over_18 = false")\
+```
