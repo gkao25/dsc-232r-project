@@ -82,6 +82,7 @@ Unfortunately, a good portion of this dataset contains NSFW content, highlighted
 
 df = df.where("is_18 = false")
 
-
+```
 df.select("subreddit").distinct().count()
 Unique Subreddits: 6857314
+```
