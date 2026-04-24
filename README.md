@@ -41,11 +41,11 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 | post_id | Links unique identifier to each post entry made by users on site | string | distinct 6-digit code | categorical | feature |
 | over_18 | Boolean identifier to flag if a post/subreddit is NSFW (TRUE) or SFW and appropriate (FALSE) | Boolean | True or False | categorical (binary) | feature |
 | subreddit | Title descriptor for forum on which users can communicate, hold discussions, and interact | string | any sequency of characters of any length | categorical | target |
-| link_flair_text | - | - | - | - | feature |
-|self_text | - | - | - | - | feature |
+| link_flair_text | Tags on post to help identify specific features contained within the post | string | any sequence of characters typically of a relatively short length | categorical | feature |
+|self_text | Primary body that makes up the forum post | string | any sequence of characters of any length | categorical | feature |
 
 **Missing/Duplicate Values Within Dataset:**
-This data does contain missing values that are primarily seen in features for link_flair_text and self_text. 
+This data does contain missing values that are primarily seen in features for link_flair_text and self_text. Additionally, self_text contains text like '[deleted]' or '[removed]' which we will consider as missing data.
 *Note: Dataset contains no image data - completely text based*
 
 ## Data Plots
@@ -57,7 +57,7 @@ This data does contain missing values that are primarily seen in features for li
 ## Preprocessing Plan
 
 **Handling Missing Values:**
-Since the primary feature we will be looking at to determine subreddit is the post title ('title'), any posts with a missing or duplicate title will be dropped from the usable set. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets since it would not be possible to predict and compare on a post missing the target variable, subreddit. Additionally, the self_text feature is vital to calculating sentiment score's in predicting the subreddit, so missing entries for this feature will also be let go from our processed dataset. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
+Since the primary feature we will be looking at to determine subreddit is the post title ('title') and the post itself ('self_text'), any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment score's in predicting the subreddit, so making predictions with missing data in these columns would cause the model to be unable to make subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets since it would not be possible to predict and compare on a post missing the target variable, subreddit. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
 
 **Data Imbalance:**
 Since this dataset contains thousands of different subreddits, it becomes clear that some of these forums appear very few times (many only once) while other subreddits are seen much more frequently. When training our models to predict subreddits for posts, many subreddits will have multiple posts to train up on compared to other subreddits which would have few to likely no subreddits to train up on. This means that when running our prediction on a validation/test set, those subreddits that the model had multiple entries to train on are going to be easier to predict while there will be many subreddits that the model has not seen and will struggle to accurately predict leading to this imbalance within the feature set of our data. To ensure fairness to different subreddits, we will be dropping any subreddits that have fewer than 10 occurrences within the overall dataset so that we can expect our model to be able to train up on the subreddits it would expect to see from the validation/test sets.
