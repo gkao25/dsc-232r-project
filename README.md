@@ -67,6 +67,10 @@ This data does contain missing values that are primarily seen in features for li
 
 *Spark Aggregation based visualizations*
 
+This bar chart shows the top 10 most common subreddits in the dataset. We can see that a few subreddits like AskReddit and DirtyKikPals have significantly higher counts compared to others, meaning most posts are concentrated in a small number of communities. This suggests the dataset is highly imbalanced, with certain subreddits dominating the data. This could impact later analysis, especially for tasks like classification, since models may be biased toward the most frequent subreddits.
+<img width="993" height="488" alt="image" src="https://github.com/user-attachments/assets/2982cea2-6532-4628-bc85-fbdb628846d8" />
+
+
 *descriptions and insights*
 
 ## Preprocessing Plan
