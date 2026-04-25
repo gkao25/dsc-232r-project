@@ -74,6 +74,13 @@ This bar chart shows the top 10 most common subreddits in the dataset. We can se
 This bar chart shows the distribution of NSFW (18+) versus non-NSFW posts in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
 <img width="540" height="391" alt="image" src="https://github.com/user-attachments/assets/79abf4e1-619b-463d-8425-e9cbaf5f50f0" />
 
+This plot shows that many posts do not contain text content, indicating that Reddit submissions are often links, images, or removed content rather than full text posts.
+<img width="601" height="389" alt="image" src="https://github.com/user-attachments/assets/fc6c7ad9-4023-4f48-875e-8cbe798e53b5" />
+
+A flair is a label assigned to a Reddit post that indicates its category or type. It helps organize content within a subreddit and provides insight into the type of posts being shared. This chart shows the most common link flairs.
+<img width="795" height="490" alt="image" src="https://github.com/user-attachments/assets/f9002be8-c7fb-4d7c-93af-b793c45b0d56" />
+
+
 
 *descriptions and insights*
 
