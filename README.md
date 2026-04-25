@@ -87,9 +87,10 @@ Unfortunately, a good portion of this dataset contains NSFW content, highlighted
 ### Spark Operations for Preprocessing:
 
 ```python
-df.count() # Number of Entries: 654221435
+df.printSchema() # provides understanding of dataset structure for processing
+df.show(5) # visualize a subset of dataset prior to beginning processing
+df.describe.show() # statistical summary of distribution of values across dataset columns
+df.count() # Number of Entries in Raw Dataset prior to Processing: 654221435
 df.select("subreddit").distinct().count() # Unique Subreddits: 6857314
-
-# get subset of entries that are under 18 
-df = df.where("over_18 = false")
+df.where("over_18 = false") # subset of posts that are appropriate for all users
 ```
