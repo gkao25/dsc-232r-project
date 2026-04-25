@@ -30,7 +30,8 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 - Executor Memory = (Total Memory - Driver Memory) / Executor Instances = (132-2) / 15 = 8.67
 
 ### Screenshot of SparkUI Showing Active Executors:
-<img width="715" height="107" alt="image" src="https://github.com/user-attachments/assets/2dd277dc-4817-4459-a5f8-da4be6c83dc7" />
+<img width="531" height="66" alt="Screenshot 2026-04-25 at 10 24 19 AM" src="https://github.com/user-attachments/assets/8e297999-f7c5-46fb-a43b-9aac31e7026e" />
+
 
 
 ## Data Exploration Using Spark
