@@ -71,6 +71,9 @@ This data does contain missing values that are primarily seen in features for `l
 This bar chart shows the top 10 most common subreddits in the dataset. We can see that a few subreddits like AskReddit and DirtyKikPals have significantly higher counts compared to others, meaning most posts are concentrated in a small number of communities. This suggests the dataset is highly imbalanced, with certain subreddits dominating the data. This could impact later analysis, especially for tasks like classification, since models may be biased toward the most frequent subreddits.
 <img width="993" height="488" alt="image" src="https://github.com/user-attachments/assets/2982cea2-6532-4628-bc85-fbdb628846d8" />
 
+This bar chart shows the distribution of NSFW (18+) versus non-NSFW posts in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
+<img width="540" height="391" alt="image" src="https://github.com/user-attachments/assets/79abf4e1-619b-463d-8425-e9cbaf5f50f0" />
+
 
 *descriptions and insights*
 
