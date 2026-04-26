@@ -9,6 +9,13 @@ Online forums like Reddit are often interested in identifying trends and pattern
 
 “Reddit Submissions Dec 2022 to Feb 2023” from Kaggle: https://www.kaggle.com/datasets/noahpersaud/reddit-submissions-dec-2022-to-feb-2023 
 
+## Repo Directory / Project Milestones
+
+2. Data Exploration
+    - download_dataset.ipynb
+    - EDA.ipynb
+3. Preprocessing & First Model Building and Evaluation
+
 ## SDSC Expanse Environment Setup
 
 ### SparkSession Configuration
@@ -38,6 +45,8 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 
 **Number of Observations in Raw Dataset: 654,221,435**
 
+*Note: Dataset contains no image data - completely text based*
+
 ### Columns (Scales, Distributions, Categorical/Continuous Type, & Feature/Target) of Dataset:
 
 | Column | Description | Scale | Distribution | Categorical/Quantitative (Type) | Feature/Target|
@@ -50,9 +59,9 @@ With our raw dataset sitting at approximately 132GB, with the memory of the driv
 |self_text | Primary body that makes up the forum post | string | any sequence of characters of any length | categorical | feature |
 
 ### Missing/Duplicate Values Within Dataset:
-This data does contain missing values that are primarily seen in features for `link_flair_text` and `self_text`. Additionally, self_text contains text like '[deleted]' or '[removed]' which we will consider as missing data. We do see duplicate data for the subreddits, but since this is both expected and desired, where we would expect the dataset to include multiple posts for likely the same forum, we will not be dropping or handling any duplicates in the subreddit target column. The only feature to worry about having duplicates would be the `post_id` since this is a unique identifier for each post made. If there are any duplicte `post_id`'s, our plan to handle it would be to test and see if each duplicate instance is the same for all 6 columns. If it is, then we will keep only one instance and drop the rest; if it is not, we will drop every instance of the duplicate `post_id`.
+This data does contain missing values that are primarily seen in features for `link_flair_text` and `self_text`. Additionally, `self_text` contains text like '[deleted]' or '[removed]', which we will consider as missing data. We observe duplicate data for the subreddits, and it is expected to have multiple posts from the same forum. Thus, we will not be dropping or handling any duplicates in the subreddit target column. The only feature to worry about having duplicates would be the `post_id`, since this is a unique identifier for each post made. If there are any duplicte `post_id`'s, our plan to handle it would be to test and see if each duplicate instance is the same for all 6 columns. If it is, then we will keep only one instance and drop the rest; if it is not, we will drop every instance of the duplicate `post_id`.
 
-### Null and empty values count:
+### Null and Empty Values Count:
 | Column           | Missing Count |
 |------------------|--------------|
 | title            | 336          |
@@ -62,38 +71,63 @@ This data does contain missing values that are primarily seen in features for `l
 | link_flair_text  | 425,449,504  |
 | self_text        | 345,790,643  |
 
-*Note: Dataset contains no image data - completely text based*
+### Subreddit Distribution:
+This table shows a summary of the distribution of subreddit entries. 75% of the subreddits have less than 3 entries. This imbalance in data will be important later when we try to evaluate our prediction model.
+
+|   |subreddit count|
+|--------|-------------|
+|count	|6.857314e+06|
+|mean	|9.540491e+01|
+|std	|5.258662e+03|
+|min	|1.000000e+00|
+|25%	|1.000000e+00|
+|50%	|1.000000e+00|
+|75%	|3.000000e+00|
+|max	|6.139237e+06|
+
 
 ## Data Plots
 
-*Spark Aggregation based visualizations*
+*Spark Aggregation-based visualizations*
 
-This bar chart shows the top 10 most common subreddits in the dataset. We can see that a few subreddits like AskReddit and DirtyKikPals have significantly higher counts compared to others, meaning most posts are concentrated in a small number of communities. This suggests the dataset is highly imbalanced, with certain subreddits dominating the data. This could impact later analysis, especially for tasks like classification, since models may be biased toward the most frequent subreddits.
+This bar chart shows the **top 10 most common subreddits** out of over 6 million unique subreddits in the dataset. 
+
 <img width="993" height="488" alt="image" src="https://github.com/user-attachments/assets/2982cea2-6532-4628-bc85-fbdb628846d8" />
 
-This bar chart shows the distribution of NSFW (18+) versus non-NSFW posts in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
+The following two graphs show the distribution of subreddits with less than 10 entries (very little entries) versus more than 3 entries (top quartile of subreddit entries count). In combination to the above graph, we can see that a few subreddits like AskReddit and DirtyKikPals have significantly higher counts compared to others, and most posts are concentrated in a small number of communities. This suggests the dataset is highly imbalanced, with certain subreddits dominating the data.
+
+![subreddit_hist1](visualization/subreddit_hist1.png)
+![subreddit_hist2](visualization/subreddit_hist2.png)
+
+
+This bar chart shows the **distribution of NSFW (18+) versus non-NSFW posts** in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
+
 <img width="540" height="391" alt="image" src="https://github.com/user-attachments/assets/79abf4e1-619b-463d-8425-e9cbaf5f50f0" />
 
-This plot shows that many posts do not contain text content, indicating that Reddit submissions are often links, images, or removed content rather than full text posts.
+This plot shows that **around 2/3 of the dataset do not contain text content** (i.e. `self_text` is Null or removed), indicating that Reddit submissions are often links, images, or removed content rather than full text posts.
+
 <img width="601" height="389" alt="image" src="https://github.com/user-attachments/assets/fc6c7ad9-4023-4f48-875e-8cbe798e53b5" />
 
-A flair is a label assigned to a Reddit post that indicates its category or type. It helps organize content within a subreddit and provides insight into the type of posts being shared. This chart shows the most common link flairs.
+A **flair** is a label assigned to a Reddit post that indicates its category or type. It helps organize content within a subreddit and provides insight into the type of posts being shared. This chart shows the **top 10 most common link flairs**.
+
 <img width="795" height="490" alt="image" src="https://github.com/user-attachments/assets/f9002be8-c7fb-4d7c-93af-b793c45b0d56" />
 
 
 
-*descriptions and insights*
-
 ## Preprocessing Plan
 
 ### Handling Missing Values:
-The primary feature we will be looking at to determine subreddit is the post title (`title`) and the post itself (`self_text`), so any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment scores in predicting the subreddit, so making predictions with missing data in these columns could cause the model to make faulty subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets, since it would not be possible to predict and compare on a post missing the target variable, subreddit. Finally, since we don't want to risk having NSFW posts/subreddits as part of our prediction model we will drop any posts that contain missing data within the `over_18` column as we would not be able to determine at this scale which of those posts and forums relate to inappropriate entries. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
+The primary feature we will be looking at to determine subreddit is the post title (`title`) and the post itself (`self_text`), so any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment scores in predicting the subreddit, so making predictions with missing data in these columns could cause the model to make faulty subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets, since it would not be possible to predict and compare on a post missing the target variable, subreddit. Finally, since we don't want to risk having NSFW posts/subreddits as part of our prediction model, we will drop rows that have missing values for the `over_18` column, because at this scale, we are unable to determine if the posts and forums relate to inappropriate entries. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
+> The predicted size of the processed dataset will be: (original size) * (proportion of missing text) * (proportion of under 18 entries) = 130 * (2/3) * (1/2) = 43GB.
 
 ### Data Imbalance:
-Since this dataset contains thousands of different subreddits, it becomes clear that some of these forums appear very few times (many only once) while other subreddits are seen much more frequently. When training our models to predict subreddits for posts, many subreddits will have multiple posts to train up on compared to other subreddits which would have few to likely no subreddits to train up on. This means that when running our prediction on a validation/test set, those subreddits that the model had multiple entries to train on are going to be easier to predict while there will be many subreddits that the model has not seen and will struggle to accurately predict leading to this imbalance within the feature set of our data. To ensure fairness to different subreddits, we will be dropping any subreddits that have fewer than 10 occurrences within the overall dataset so that we can expect our model to be able to train up on the subreddits it would expect to see from the validation/test sets.
+Since this dataset contains millions of different subreddits, it becomes clear that some of these forums appear very few times (many only once) while other subreddits are seen much more frequently. When training our models to predict subreddits for posts, many subreddits will have multiple posts to train up on compared to other subreddits which would have few to almost no entries to train on. This could lead to biased prediction in our model. When predicting the validation/test set, those subreddits that the model had multiple entries to train on are going to be easier to predict, versus the many other subreddits that the model has not seen and thus struggle to accurately predict. To ensure fairness to different subreddits, we will be dropping any subreddits that have fewer than 10 occurrences within the overall dataset so that we can expect our model to be able to train up on the subreddits it would expect to see from the validation/test sets.
 
 ### Data Transformations (Scaling, Encoding, Feature Engineering):
-Unfortunately, a good portion of this dataset contains NSFW content, highlighted by the `over_18` feature, the first step in cleaning and transforming our data into a format we feel comfortable working with for this project is to drop any posts from our dataset that have a TRUE boolean value for this column. This should not only drop a good portion of rows, many of which contain few, distinct, unique subreddits, but will also make our dataset much more scalable as we move forward with our modeling plan. While we acknowledge these subreddits are important to deterministic aspects to reddits business model, from an academic and comfrtability standpoint this is the most appropriate path forward for our group. We will also be leveraging transformation encodings such as TF-IDF, One-Hot Encoding (OHE), or Word2Vec methods such as the VADER Lexicon for sentiment analysis. This will be necessary for the NLP techniques we plan to implement in order to process the thousands of text-based post features we are utilizing so that our model can predict subreddits accurately. We will apply sentiment analysis to each of the self_text rows, to then group all sentiment scores (on a scale from -1 for most negative to +1 for most positive) according to subreddit. This will provide us with a way to see which 5 subreddits have the most positive or negative sentiment.
+Unfortunately, a good portion of this dataset contains NSFW content, highlighted by the `over_18` feature. Thus, our first step of preprocessing is to transform our data into something appropriate, by droping all entries labeled TRUE for this column. This will drop a good portion of rows and make our dataset much more scalable as we move forward with our modeling plan. While we acknowledge these subreddits are important to deterministic aspects to Reddit's business model, from an academic and comfrtability standpoint, this is the most appropriate path forward for our group. 
+
+Before we perform sentiment analysis and train our model, we will clean the text data to make them more uniform. Such cleaning includes ensuring the correct datatype, turning all text into lower-case, resolving unknown values, etc. Then we can leverage transformation encodings such as TF-IDF, One-Hot Encoding (OHE), or Word2Vec methods such as the VADER Lexicon for sentiment analysis. This will be necessary for the NLP techniques we plan to implement in order to process the thousands of text-based post features we are utilizing, so that our model can predict subreddits accurately. We will apply sentiment analysis to each of the `self_text` rows, then group all sentiment scores (on a scale from -1 for most negative to +1 for most positive) according to subreddit. This will provide us with a way to see which 5 subreddits have the most positive or negative sentiment.
+
 
 ### Spark Operations for Preprocessing:
 
