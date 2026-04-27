@@ -104,11 +104,12 @@ The following two graphs show the distribution of subreddits with less than 10 e
 
 This bar chart shows the **distribution of NSFW (18+) versus non-NSFW posts** in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
 
-<img width="540" height="391" alt="image" src="https://github.com/user-attachments/assets/79abf4e1-619b-463d-8425-e9cbaf5f50f0" />
+![text_pie](visualization/over18_pie.png)
 
 This plot shows that **around 2/3 of the dataset do not contain text content** (i.e. `self_text` is Null or removed), indicating that Reddit submissions are often links, images, or removed content rather than full text posts.
 
-<img width="601" height="389" alt="image" src="https://github.com/user-attachments/assets/fc6c7ad9-4023-4f48-875e-8cbe798e53b5" />
+![text_pie](visualization/text_presence_pie.png)
+
 
 A **flair** is a label assigned to a Reddit post that indicates its category or type. It helps organize content within a subreddit and provides insight into the type of posts being shared. This chart shows the **top 10 most common link flairs**.
 
@@ -120,7 +121,8 @@ A **flair** is a label assigned to a Reddit post that indicates its category or 
 
 ### Handling Missing Values:
 The primary feature we will be looking at to determine subreddit is the post title (`title`) and the post itself (`self_text`), so any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment scores in predicting the subreddit, so making predictions with missing data in these columns could cause the model to make faulty subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets, since it would not be possible to predict and compare on a post missing the target variable, subreddit. Finally, since we don't want to risk having NSFW posts/subreddits as part of our prediction model, we will drop rows that have missing values for the `over_18` column, because at this scale, we are unable to determine if the posts and forums relate to inappropriate entries. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
-> The predicted size of the processed dataset will be: (original size) * (proportion of missing text) * (proportion of under 18 entries) = 130 * (2/3) * (1/2) = 43GB.
+
+> The predicted size of the processed dataset will be: (original size) * (proportion of dataset with text) * (proportion of dataset under 18) = 130 * (1/3) * (1/2) = 43GB.
 
 ### Data Imbalance:
 Since this dataset contains millions of different subreddits, it becomes clear that some of these forums appear very few times (many only once) while other subreddits are seen much more frequently. When training our models to predict subreddits for posts, many subreddits will have multiple posts to train up on compared to other subreddits which would have few to almost no entries to train on. This could lead to biased prediction in our model. When predicting the validation/test set, those subreddits that the model had multiple entries to train on are going to be easier to predict, versus the many other subreddits that the model has not seen and thus struggle to accurately predict. To ensure fairness to different subreddits, we will be dropping any subreddits that have fewer than 10 occurrences within the overall dataset so that we can expect our model to be able to train up on the subreddits it would expect to see from the validation/test sets.
