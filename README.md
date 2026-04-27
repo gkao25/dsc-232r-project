@@ -78,14 +78,14 @@ This table shows a summary of the distribution of subreddit entries. 75% of the 
 
 |   |subreddit count|
 |--------|-------------|
-|count	|6.857314e+06|
-|mean	|9.540491e+01|
-|std	|5.258662e+03|
-|min	|1.000000e+00|
-|25%	|1.000000e+00|
-|50%	|1.000000e+00|
-|75%	|3.000000e+00|
-|max	|6.139237e+06|
+|count	|6.86 million|
+|mean	|95.41|
+|std	|5,258.66|
+|min	|1|
+|25%	|1|
+|50%	|1|
+|75%	|3|
+|max	|6,139,237|
 
 
 ## Data Plots
@@ -96,22 +96,22 @@ This bar chart shows the **top 10 most common subreddits** out of over 6 million
 
 <img width="993" height="488" alt="image" src="https://github.com/user-attachments/assets/2982cea2-6532-4628-bc85-fbdb628846d8" />
 
-The following two graphs show the distribution of subreddits with less than 10 entries (very little entries) versus more than 3 entries (top quartile of subreddit entries count). In combination to the above graph, we can see that a few subreddits like AskReddit and DirtyKikPals have significantly higher counts compared to others, and most posts are concentrated in a small number of communities. This suggests the dataset is highly imbalanced, with certain subreddits dominating the data.
+The following two graphs show the distribution of subreddits with less than 10 entries (very little entries) versus more than 3 entries (top quartile of subreddit entries count). In combination to the above graph, we can see that a few subreddits like AskReddit and DirtyKikPals have significantly higher counts compared to others, and most posts are concentrated in a small number of communities. This suggests the dataset is highly imbalanced, with certain subreddits dominating the data. We'll also notice quite a bit of these subreddits relate to some innappropriate, NSFW forum that we'll want to filter out later on.
 
 ![subreddit_hist1](visualization/subreddit_hist1.png)
 ![subreddit_hist2](visualization/subreddit_hist2.png)
 
 
-This bar chart shows the **distribution of NSFW (18+) versus non-NSFW posts** in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
+This pie chart shows the **distribution of NSFW (18+) versus non-NSFW posts** in the dataset. Most posts are not marked as 18+, with approximately 400 million non-NSFW posts compared to around 260 million NSFW posts. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories.
 
 ![text_pie](visualization/over18_pie.png)
 
-This plot shows that **around 2/3 of the dataset do not contain text content** (i.e. `self_text` is Null or removed), indicating that Reddit submissions are often links, images, or removed content rather than full text posts.
+This plot shows that **around 2/3 of the dataset do not contain text content** (i.e. `self_text` is Null or removed), indicating that Reddit submissions are often links, images, or removed content rather than full text posts. Missing data like this is significant in showing that the prime feature for which we hoped to build our models will either not be able to be considered in determining subreddits or cause the post to be dropped entirely. It's also an important analytic indicator to show that while some posts may have a title but not post text, there are other aspects to posts that could just involve circumstance such as another non-text based medium, a post is taken down by a user, or that some posts could be getting flagged and removed for violating reddit policy.
 
 ![text_pie](visualization/text_presence_pie.png)
 
 
-A **flair** is a label assigned to a Reddit post that indicates its category or type. It helps organize content within a subreddit and provides insight into the type of posts being shared. This chart shows the **top 10 most common link flairs**.
+A **flair** is a label assigned to a Reddit post that indicates its category or type. It helps organize content within a subreddit and provides insight into the type of posts being shared. This chart shows the **top 10 most common link flairs**. This gives a sense of what the most popular posts tend to be about or associated to. We can see that approximately 20 million posts are split between being Discussions or Questions posted across forums.
 
 <img width="795" height="490" alt="image" src="https://github.com/user-attachments/assets/f9002be8-c7fb-4d7c-93af-b793c45b0d56" />
 
