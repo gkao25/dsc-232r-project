@@ -33,10 +33,11 @@ spark = SparkSession.builder \
     .appName("KaggleData") \
     .getOrCreate()
 ```
-With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 10GB (130GB/15 executors).
+With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 10GB. The total requested memory is 152GB. 
 
-- Executor instances = Total Cores - 1 = 15
-- Executor Memory = (Total Memory - Driver Memory) / Executor Instances = (132-2) / 15 = 8.67
+- Executor Instances = Total Cores - 1 = 15
+- Executor Memory = (Total Memory - Driver Memory) / Executor Instances = (152-2) / 15 = 10
+- With a 132GB dataset and 15 instances, we need at least (132-2)/15 = 8.67GB per executor. 
 
 ### Screenshot of SparkUI Showing Active Executors:
 <img width="531" height="66" alt="Screenshot 2026-04-25 at 10 24 19 AM" src="https://github.com/user-attachments/assets/8e297999-f7c5-46fb-a43b-9aac31e7026e" />
@@ -106,6 +107,7 @@ This bar chart shows the **distribution of NSFW (18+) versus non-NSFW posts** in
 
 ![text_pie](visualization/over18_pie.png)
 
+
 This plot shows that **around 2/3 of the dataset do not contain text content** (i.e. `self_text` is Null or removed), indicating that Reddit submissions are often links, images, or removed content rather than full text posts.
 
 ![text_pie](visualization/text_presence_pie.png)
@@ -115,6 +117,17 @@ A **flair** is a label assigned to a Reddit post that indicates its category or 
 
 <img width="795" height="490" alt="image" src="https://github.com/user-attachments/assets/f9002be8-c7fb-4d7c-93af-b793c45b0d56" />
 
+### EDA After Removing Nulls:
+
+We have removed the entries that are labeled over 18 and have no self_text, and compared the proportions of missing/duplicates. 
+
+![before_removing](visualization/before_removing.png)
+![after_removing](visualization/after_removing.png)
+
+Here is another graph showing the top 10 most common subreddits, after the removing the unwanted entries. The ranking has changed drastically and removed the clearly inappropriate subreddits such as Dirtykikpals.
+
+![top_reddit_after_remove](visualization/top_reddit_after_remove.png)
+
 
 
 ## Preprocessing Plan
@@ -122,7 +135,7 @@ A **flair** is a label assigned to a Reddit post that indicates its category or 
 ### Handling Missing Values:
 The primary feature we will be looking at to determine subreddit is the post title (`title`) and the post itself (`self_text`), so any posts with a missing or duplicate title or post text will be dropped from the usable set. These features are vital to calculating sentiment scores in predicting the subreddit, so making predictions with missing data in these columns could cause the model to make faulty subreddit predictions. Similarly, any entries missing a subreddit will also be dropped from consideration for our training, validation, and test sets, since it would not be possible to predict and compare on a post missing the target variable, subreddit. Finally, since we don't want to risk having NSFW posts/subreddits as part of our prediction model, we will drop rows that have missing values for the `over_18` column, because at this scale, we are unable to determine if the posts and forums relate to inappropriate entries. Since the other features will be less important for prediction, any missing values encountered for those posts will be kept to potentially make more accurate predictions. 
 
-> The predicted size of the processed dataset will be: (original size) * (proportion of dataset with text) * (proportion of dataset under 18) = 130 * (1/3) * (1/2) = 43GB.
+> The predicted size of the processed dataset will be: (original size) * (proportion of dataset with text) * (proportion of dataset under 18) = 130GB * (1/3) * (1/2) = 21GB. Processed dataset will still meet the required minimum of 10GB, which cannot fit comfortably in a laptop and requires Spark distributed processing.
 
 ### Data Imbalance:
 Since this dataset contains millions of different subreddits, it becomes clear that some of these forums appear very few times (many only once) while other subreddits are seen much more frequently. When training our models to predict subreddits for posts, many subreddits will have multiple posts to train up on compared to other subreddits which would have few to almost no entries to train on. This could lead to biased prediction in our model. When predicting the validation/test set, those subreddits that the model had multiple entries to train on are going to be easier to predict, versus the many other subreddits that the model has not seen and thus struggle to accurately predict. To ensure fairness to different subreddits, we will be dropping any subreddits that have fewer than 10 occurrences within the overall dataset so that we can expect our model to be able to train up on the subreddits it would expect to see from the validation/test sets.
