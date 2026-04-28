@@ -33,7 +33,7 @@ spark = SparkSession.builder \
     .appName("KaggleData") \
     .getOrCreate()
 ```
-With our raw dataset sitting at approximately 132GB, with the memory of the driver allocated at 2GB, the best option for our setup requires an executor instance of 15 where we have 16 cores with one assigned to the driver. Additonally, with 15 executors needing to compute a dataset at this size (132GB with 2GB set aside for the driver), the memory allocated for each executor would be about 10GB. The total requested memory is 152GB. 
+With our raw dataset sitting at approximately 132GB and the memory of the driver allocated at 2GB, the best option for our setup requires 16 cores total, with 1 assigned to the driver and 15 as executor instances. Additonally, to distribute the 132GB of raw data comfortably, the memory allocated for each executor is about 10GB. The total requested memory is 152GB. 
 
 - Executor Instances = Total Cores - 1 = 15
 - Executor Memory = (Total Memory - Driver Memory) / Executor Instances = (152-2) / 15 = 10
@@ -119,7 +119,7 @@ A **flair** is a label assigned to a Reddit post that indicates its category or 
 
 ### EDA After Removing Nulls:
 
-We have removed the entries that are labeled over 18 and have no self_text, and compared the proportions of missing/duplicates. 
+On a subset of dataset (around 4% of total), we removed the entries that are labeled over 18 and have no self_text, and compared the proportions of missing/duplicates. 
 
 ![before_removing](visualization/before_removing.png)
 ![after_removing](visualization/after_removing.png)
