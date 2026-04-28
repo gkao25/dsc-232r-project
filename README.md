@@ -126,7 +126,7 @@ On a subset of dataset (around 4% of total), we removed the entries that are lab
 
 Here is another graph showing the top 10 most common subreddits, after the removing the unwanted entries. The ranking has changed drastically and removed the clearly inappropriate subreddits such as Dirtykikpals.
 
-![top_reddit_after_remove](visualization/top_reddit_after_remove.png)
+![top_reddit_after_remove](TopSubredditsNon18Plus.png)
 
 
 
