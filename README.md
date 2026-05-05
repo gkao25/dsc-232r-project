@@ -191,7 +191,7 @@ pyspark.ml.classification.RandomForestClassifier
 
 ### Results with Different Hyperparameters
 **Hyperparameters: N=...**
-| Dataset Type | Ground Truth Subreddit | Default Model Predicted Subreddit | Parameterize Model Predicted Subreddit | Accuracy |
+| Dataset Type | Ground Truth Subreddit | Default Model Predicted Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- | --- |
 | Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
 | Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
