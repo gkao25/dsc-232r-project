@@ -157,6 +157,10 @@ df.select("subreddit").distinct().count() # Unique Subreddits: 6857314
 df.where("over_18 = false") # subset of posts that are appropriate for all users
 ```
 
+## Completion of Preprocessing
+**Imputing Missing, Deleted, & Removed Values:** Filter
+**Encoding:** OneHotEncoder
+
 ## Distributed Model
 **Distributed Model: Decision Trees/Random Forests**\
 Implementation:
