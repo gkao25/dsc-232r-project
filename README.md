@@ -159,7 +159,7 @@ df.where("over_18 = false") # subset of posts that are appropriate for all users
 
 ## Completion of Preprocessing
 **Imputing Missing, Deleted, & Removed Values:** Filter
-**Encoding:** OneHotEncoder
+**Encoding:** Hugging Face Tokenizer
 
 ## Distributed Model
 **Distributed Model: Decision Trees/Random Forests**\
