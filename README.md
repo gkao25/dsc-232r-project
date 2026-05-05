@@ -156,3 +156,55 @@ df.count() # Number of Entries in Raw Dataset prior to Processing: 654221435
 df.select("subreddit").distinct().count() # Unique Subreddits: 6857314
 df.where("over_18 = false") # subset of posts that are appropriate for all users
 ```
+
+## Distributed Model
+**Distributed Model: Decision Trees/Random Forests**\
+Implementation:
+```python
+pyspark.ml.classification.DecisionTreeClassifier
+pyspark.ml.classification.RandomForestClassifier
+```
+*Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets*
+
+**Multiple Executors Used:**
+*Insert Image of Multiple Active Executors*
+
+### Training and Test Error of Distributed Model
+| Training Error | Test Error |
+| --- | --- |
+|   |   | 
+
+### Supervised Learning Approach
+| Dataset Type | Ground Truth Subreddit | Predicted Subreddit | Accuracy |
+| --- | --- | --- | --- |
+| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
+| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
+| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
+| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
+| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
+
+*maybe can create 3 separate tables for each dataset type*
+
+## Fitting Analysis of Distributed Model
+
+**Fitting Graph:** 
+
+### Results with Different Hyperparameters
+**Hyperparameters: N=...**
+| Dataset Type | Ground Truth Subreddit | Default Model Predicted Subreddit | Parameterize Model Predicted Subreddit | Accuracy |
+| --- | --- | --- | --- | --- |
+| Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
+| Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
+| Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
+
+### Additional Planned Models
+*based on Abstract* \
+**Model 1:** \
+**Model 2:** 
+
+### Conclusion of Distributed Model
+**Conclusion:**
+
+**Potential Improvements:**
+
+**Distributed Computing:**
