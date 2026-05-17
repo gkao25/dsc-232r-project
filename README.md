@@ -169,8 +169,9 @@ pyspark.ml.classification.RandomForestClassifier
 ```
 *Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets*
 
-**Multiple Executors Used:**
-*Insert Image of Multiple Active Executors*
+**Multiple Executors Used:**\
+<img width="530" height="67" alt="Screenshot 2026-05-17 at 12 31 46 PM" src="https://github.com/user-attachments/assets/71a8a5be-e7c9-4f98-808d-1ec1d8ff92bc" />
+
 
 ### Training and Test Error of Distributed Model
 | Training Error | Test Error |
