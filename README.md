@@ -172,7 +172,7 @@ pyspark.ml.classification.RandomForestClassifier
 ```
 *Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets*
 
-**Parameters: maxDepth = 5**
+**Parameters: numTrees = 10, maxDepth = 5, maxBins = 32, seed = 42**
 
 **Multiple Executors Used:**\
 <img width="530" height="67" alt="Screenshot 2026-05-17 at 12 31 46 PM" src="https://github.com/user-attachments/assets/71a8a5be-e7c9-4f98-808d-1ec1d8ff92bc" />
@@ -181,7 +181,7 @@ pyspark.ml.classification.RandomForestClassifier
 ### Training and Test Error of Distributed Model
 | Training Error | Validation Error | Test Error |
 | --- | --- | --- |
-|  |  |  | 
+| 95.886% | 95.873% | 95.909% | 
 
 ### Supervised Learning Approach
 | Dataset Type | Ground Truth Subreddit | Predicted Subreddit | Accuracy |
@@ -193,14 +193,12 @@ pyspark.ml.classification.RandomForestClassifier
 | Test | Value | Estimate | Correct |
 | Test | Value | Estimate | Incorrect |
 
-*maybe can create 3 separate tables for each dataset type*
-
 ## Fitting Analysis of Distributed Model
 
 **Fitting Graph:** The results between our training, validation, and test set for the decision tree based model tend to be pretty similar. Overfitting, typically, can be seen when the model performs well or better on the training set compared to the validation/test set of unseen data where it performs worse since the model hasn't had a chance to get used to new data. The similarity between the poor accuracy of all 3 sets isn't really an indicator our model is overfitting since it's not even fitting well on the training data to begin with. Underfitting occurs when the model is too simple and does not capture the patterns inherent in the text of subreddit posts well enough to predict with good enough accuracy depsite the dataset. This is very accurate to the large error we see in our model across our training, validation, and test sets which creates a clear indication our model tends to underfit the subreddit data. 
 
 ### Results with Different Hyperparameters
-**Hyperparameters: numTrees = 15, maxDepth = None, maxBins = 32, impurity = "entropy", seed = 42**
+**Hyperparameters: numTrees = 15, maxDepth = 5, maxBins = 32, seed = 42**
 | Training Error | Validation Error | Test Error |
 | --- | --- | --- |
 | 95.862% | 95.877% | 95.874% |
@@ -215,7 +213,6 @@ pyspark.ml.classification.RandomForestClassifier
 | Test | Value | Parameterized Estimate | Incorrect |
 
 ### Additional Planned Model Options
-*based on Abstract* \
 **Model 1:** \
 **Model 2:** 
 
