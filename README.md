@@ -186,11 +186,11 @@ pyspark.ml.classification.RandomForestClassifier
 ### Supervised Learning Approach
 | Dataset Type | Ground Truth Subreddit | Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
-| Train | Value | Estimate | Correct |
+| Train | apexlegends | apexlegends | Correct |
 | Train | AskReddit | Advice | Incorrect |
-| Validation | Value | Estimate | Correct |
+| Validation | sneakerhead | sneakerhead | Correct |
 | Validation | teenagers | relationship_advice | Incorrect |
-| Test | Value | Estimate | Correct |
+| Test | FashionReps | FashionReps | Correct |
 | Test | AskReddit | Advice | Incorrect |
 
 ## Fitting Analysis of Distributed Model
@@ -205,12 +205,12 @@ pyspark.ml.classification.RandomForestClassifier
 
 | Dataset Type | Ground Truth Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
-| Train | NoStupidQuestions | Advice | Correct |
-| Train | Value | Parameterized Estimate | Incorrect |
-| Validation | Value | Parameterized Estimate | Correct |
+| Train | PokemonGoFriends | PokemonGoFriends | Correct |
+| Train | NoStupidQuestions | Advice | Incorrect |
+| Validation | plantwatch | plantwatch | Correct |
 | Validation | teenagers | AskReddit | Incorrect |
-| Test | Value | Parameterized Estimate | Correct |
-| Test | Advice | AskReddit | Incorrect |
+| Test | apexlegends | apexlegends | Correct |
+| Test | Advice | relationship_advice | Incorrect |
 
 ### Additional Planned Model Options
 **Model 1:** \
