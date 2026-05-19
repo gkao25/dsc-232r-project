@@ -172,46 +172,56 @@ pyspark.ml.classification.RandomForestClassifier
 ```
 *Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets*
 
+**Parameters: maxDepth = 5**
+
 **Multiple Executors Used:**\
 <img width="530" height="67" alt="Screenshot 2026-05-17 at 12 31 46 PM" src="https://github.com/user-attachments/assets/71a8a5be-e7c9-4f98-808d-1ec1d8ff92bc" />
 
 
 ### Training and Test Error of Distributed Model
-| Training Error | Test Error |
-| --- | --- |
-|   |   | 
+| Training Error | Validation Error | Test Error |
+| --- | --- | --- |
+|  |  |  | 
 
 ### Supervised Learning Approach
 | Dataset Type | Ground Truth Subreddit | Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
-| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
-| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
-| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
-| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
-| Train/Validation/Test | Value | Estimate | Correct/Incorrect |
+| Train | Value | Estimate | Correct |
+| Train | Value | Estimate | Incorrect |
+| Validation | Value | Estimate | Correct |
+| Validation | Value | Estimate | Incorrect |
+| Test | Value | Estimate | Correct |
+| Test | Value | Estimate | Incorrect |
 
 *maybe can create 3 separate tables for each dataset type*
 
 ## Fitting Analysis of Distributed Model
 
-**Fitting Graph:** 
+**Fitting Graph:** The results between our training, validation, and test set for the decision tree based model tend to be pretty similar. Overfitting, typically, can be seen when the model performs well or better on the training set compared to the validation/test set of unseen data where it performs worse since the model hasn't had a chance to get used to new data. The similarity between the poor accuracy of all 3 sets isn't really an indicator our model is overfitting since it's not even fitting well on the training data to begin with. Underfitting occurs when the model is too simple and does not capture the patterns inherent in the text of subreddit posts well enough to predict with good enough accuracy depsite the dataset. This is very accurate to the large error we see in our model across our training, validation, and test sets which creates a clear indication our model tends to underfit the subreddit data. 
 
 ### Results with Different Hyperparameters
-**Hyperparameters: N=...**
-| Dataset Type | Ground Truth Subreddit | Default Model Predicted Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
-| --- | --- | --- | --- | --- |
-| Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
-| Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
-| Train/Validation/Test | Value | Default Estimate | Parameterized Estimate | Correct/Incorrect |
+**Hyperparameters: numTrees = 15, maxDepth = None, maxBins = 32, impurity = "entropy", seed = 42**
+| Training Error | Validation Error | Test Error |
+| --- | --- | --- |
+| 95.862% | 95.877% | 95.874% |
 
-### Additional Planned Models
+| Dataset Type | Ground Truth Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
+| --- | --- | --- | --- |
+| Train | Value | Parameterized Estimate | Correct |
+| Train | Value | Parameterized Estimate | Incorrect |
+| Validation | Value | Parameterized Estimate | Correct |
+| Validation | Value | Parameterized Estimate | Incorrect |
+| Test | Value | Parameterized Estimate | Correct |
+| Test | Value | Parameterized Estimate | Incorrect |
+
+### Additional Planned Model Options
 *based on Abstract* \
 **Model 1:** \
 **Model 2:** 
 
 ### Conclusion of Distributed Model
-**Conclusion:**
+**Conclusion:** 
 
-**Potential Improvements:**
+**Potential Improvements:** Despite our best efforts to select different hyperparameters the model struggles to be able to  accurately predict subreddits. The issue can primarily be pinpointed down to the incredibly large amounts of subreddits that show up in our dataset despite our best efforts to implement a threshold. Since some subreddits show up at a comparitively larger proportion than others and most show up very few times, our training set just doesn't have the type of conistency that we would like to be able to predict with a lower error. By chance when splitting with the amount of subreddits, it's likely many subreddits are not included as options from our training set and will ultimately fail in validation and test. A fix would be to require, when splitting, to ensure every subreddit has at least 3 entries in each of our training, validation, and test sets. Additionally, there are too many subreddit options for which our model is trying to pick the best one on, many subreddits being very similar. A better way to be able to improve our model while maintaining its large size would be to only work on the largest subset of say 10 or 20 of the subreddits with the most posts. This would of course alter the predictive capacity of our model, but would be a way to potentially improve it by focusing on the subreddits that have more posts to train the model better while also limiting the options from which our model will predict a subreddit. 
 
 **Distributed Computing:** Leveraging various indpendent computing nodes to handle reading, processing, training, and evaluating our dataset is a necessary aspect to working with a dataset of this size. Since many of our normal machines can't run these steps locally based on the size of this dataset, splitting up the tasks across different resources allows these resources to not just be set up to handle data of this size but also run them concurrently across machines. In other words, while its possible to scale our data to a processor that can handle the size, splitting up the task across various nodes will increase computational efficiency by allowing various different nodes to try to do that same work in a faster timeframe than if everything was done individually and sequentially from one large resource.
