@@ -8,7 +8,7 @@ Gloria Kao, Mahir Oza, Ali Karim, Michael Nodini
    - Code: [download_dataset.ipynb](https://github.com/gkao25/dsc-232r-project/blob/bb39ec4cd61d4468fb7779f2b82e6c5df5f93630/download_dataset.ipynb), [EDA.ipynb](https://github.com/gkao25/dsc-232r-project/blob/bb39ec4cd61d4468fb7779f2b82e6c5df5f93630/EDA.ipynb)
    - EDA Results: [see below](#data-exploration-using-spark)
 3. Preprocessing & First Model Building and Evaluation
-   - Code:
+   - Code: [preprocessing_training.ipynb](https://github.com/gkao25/dsc-232r-project/blob/main/preprocessing_training.ipynb)
    - Preprocessing Description: [see below](#preprocessing-plan)
    - Model Evaluation: [see below](#distributed-model)
 4. Final Submission
