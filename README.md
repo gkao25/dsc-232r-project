@@ -213,7 +213,8 @@ pyspark.ml.classification.RandomForestClassifier
 | Test | Advice | relationship_advice | Incorrect |
 
 ### Additional Planned Model Options
-**Model 1:** \
+We are specifically interested in trying distributed XGBoost in Spark (SparkXGBClassifier) because it is designed to scale to larger datasets and may better capture relationships in the text compared to a single Decision Tree. Since our current models appear to underfit, I think XGBoost may improve predictive performance while still taking advantage of distributed computing on Expanse.
+**Model 1:** 
 **Model 2:** 
 
 ### Conclusion of Distributed Model
