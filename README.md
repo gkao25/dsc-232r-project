@@ -178,7 +178,7 @@ pyspark.ml.classification.RandomForestClassifier
 <img width="530" height="67" alt="Screenshot 2026-05-17 at 12 31 46 PM" src="https://github.com/user-attachments/assets/71a8a5be-e7c9-4f98-808d-1ec1d8ff92bc" />
 
 
-### Training and Test Error of Distributed Model
+### Training and Test Error of Distributed Model (Random Forest Classifier)
 | Training Error | Validation Error | Test Error |
 | --- | --- | --- |
 | 95.886% | 95.873% | 95.909% | 
