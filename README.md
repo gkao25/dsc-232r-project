@@ -187,11 +187,11 @@ pyspark.ml.classification.RandomForestClassifier
 | Dataset Type | Ground Truth Subreddit | Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
 | Train | Value | Estimate | Correct |
-| Train | Value | Estimate | Incorrect |
+| Train | AskReddit | Advice | Incorrect |
 | Validation | Value | Estimate | Correct |
-| Validation | Value | Estimate | Incorrect |
+| Validation | teenagers | relationship_advice | Incorrect |
 | Test | Value | Estimate | Correct |
-| Test | Value | Estimate | Incorrect |
+| Test | AskReddit | Advice | Incorrect |
 
 ## Fitting Analysis of Distributed Model
 
@@ -205,12 +205,12 @@ pyspark.ml.classification.RandomForestClassifier
 
 | Dataset Type | Ground Truth Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
-| Train | Value | Parameterized Estimate | Correct |
+| Train | NoStupidQuestions | Advice | Correct |
 | Train | Value | Parameterized Estimate | Incorrect |
 | Validation | Value | Parameterized Estimate | Correct |
-| Validation | Value | Parameterized Estimate | Incorrect |
+| Validation | teenagers | AskReddit | Incorrect |
 | Test | Value | Parameterized Estimate | Correct |
-| Test | Value | Parameterized Estimate | Incorrect |
+| Test | Advice | AskReddit | Incorrect |
 
 ### Additional Planned Model Options
 **Model 1:** \
