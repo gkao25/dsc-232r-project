@@ -212,6 +212,11 @@ pyspark.ml.classification.RandomForestClassifier
 | Test | apexlegends | apexlegends | Correct |
 | Test | Advice | relationship_advice | Incorrect |
 
+### Interpretation
+The reason our error rates are so high could be due to the fact that we have a large number of labels to classify and the distribution is highly imbalanced (as previously explained in the EDA). Below is a screenshot showing the value counts of unique subreddits in a 0.01% sample. There is a total of 5838 unique subreddits, many of which only has 1 entry. Thus, the error rate of 95% is better than randomly predicting labels. For this sample dataset, the probability of randomly assigning the correct label 1/5838=0.00017
+
+![temp_df](visualization/temp_df.png)
+
 ### Additional Planned Model Options
 We are specifically interested in trying distributed XGBoost in Spark (SparkXGBClassifier) because it is designed to scale to larger datasets and may better capture relationships in the text compared to a single Decision Tree. Since our current models appear to underfit, we think XGBoost may improve predictive performance while still taking advantage of distributed computing on Expanse.
 
