@@ -8,7 +8,7 @@ Gloria Kao, Mahir Oza, Ali Karim, Michael Nodini
    - Code: [download_dataset.ipynb](https://github.com/gkao25/dsc-232r-project/blob/bb39ec4cd61d4468fb7779f2b82e6c5df5f93630/download_dataset.ipynb), [EDA.ipynb](https://github.com/gkao25/dsc-232r-project/blob/bb39ec4cd61d4468fb7779f2b82e6c5df5f93630/EDA.ipynb)
    - EDA Results: [see below](#data-exploration-using-spark)
 3. Preprocessing & First Model Building and Evaluation
-   - Code: [preprocessing_training.ipynb](https://github.com/gkao25/dsc-232r-project/blob/main/preprocessing_training.ipynb)
+   - Code: [preprocessing_training.ipynb](https://github.com/gkao25/dsc-232r-project/blob/main/preprocessing_training.ipynb), [training2.ipynb](https://github.com/gkao25/dsc-232r-project/blob/main/training2.ipynb)
    - Preprocessing Description: [see below](#preprocessing-plan)
    - Model Evaluation: [see below](#distributed-model)
 4. Final Submission
@@ -166,9 +166,9 @@ After planning the preprocessing goals set forth in previous sections to filter 
 ## Distributed Model
 **Distributed Model: Decision Trees/Random Forests**
 
+Implementation:
 [Jupyter Notebook Code](https://github.com/gkao25/dsc-232r-project/blob/main/preprocessing_training.ipynb)
 
-Implementation:
 ```python
 pyspark.ml.classification.DecisionTreeClassifier
 pyspark.ml.classification.RandomForestClassifier
@@ -232,7 +232,8 @@ Our two Random Forest classifiers performed similarly despite different hyperpar
 > We are aware that this is a deviation from the project requirement. Our motivation is simply wanting to see a model with at leat 60% accuracy, and perhaps as an early start to Milestone 4.
 
 ### Naive Bayes' Multinomial Model
-[Jupyter Notebook Code]()
+[Jupyter Notebook Code](https://github.com/gkao25/dsc-232r-project/blob/main/training2.ipynb)
+
 This model shows much better accuracy of approxmiately 61%. We achieved this by filtering the dataset so that only the top 100 subreddits are used for training, and this solved the problem of imbalaced dataset. We also tried different hyperparameters on this model. A smaller smoothing coefficient is supposed to help with underfitting (low accuracy), however, it did not have much affect here as you can see in the below tables.
 
 **Hyperparamter: smoothing = 1.0**
