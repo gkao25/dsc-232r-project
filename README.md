@@ -164,20 +164,23 @@ df.where("over_18 = false") # subset of posts that are appropriate for all users
 After planning the preprocessing goals set forth in previous sections to filter down our dataset and ensure its readiness when the time comes for modeling, we began our implementation of these ideas using SparkDataframe operations. Before we could look at missing values or even the feature sets themselves, we felt it would be best to first filter out the posts that were tagged as `over_18`, which makes computation faster, and also makes us more comfortable to read the entries. Since our data is almost entirely text based (including the post ids since they are unique codes albeit represented numerically), the idea of scaling text to new values or imputing missing values with made up ones do not entirely make sense. However, as we outlined earlier, we needed a way to handle these instances of missing, removed, or deleted data in the features we identified as being most vital - `subreddit` and `self_text`. Since the main input component to our model will come from `self_text` we felt it would be okay to allow missing `title` entries as long as they both had `subreddit` and `self_text` values. Once our dataset was cleaned of inconsistent values, we wanted to implement some type of encoding. Using VectorAssembler and choosing the Hugging Face Tokenizer, encode our text-based feature set of `self_text` and `title` prior to modeling. The different models we end up implementing will be more efficient when interpeting the data, identifying patterns, and making insightful decisions. Using a pre-trained tokenizer like this rather than requiring clusters to talk to each other, it will be faster and more efficient to transform our data backed by a tested and common tokenizer to handle our text feature. Once our dataset was completed our final processing task was to split the data to train and test our model. Using a 70-15-15 split, we separate our dataset so that 70% of it will be accounted for in the training set, 15% will make up the vaildation set, and the final 15% of the data will set up our test set. 
 
 ## Distributed Model
-**Distributed Model: Decision Trees/Random Forests**\
+**Distributed Model: Decision Trees/Random Forests**
+
+[Jupyter Notebook Code](https://github.com/gkao25/dsc-232r-project/blob/main/preprocessing_training.ipynb)
+
 Implementation:
 ```python
 pyspark.ml.classification.DecisionTreeClassifier
 pyspark.ml.classification.RandomForestClassifier
 ```
-*Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets*
+*Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets. Only a subset of 1% is used for training.*
 
 **Multiple Executors Used:**\
 <img width="530" height="67" alt="Screenshot 2026-05-17 at 12 31 46 PM" src="https://github.com/user-attachments/assets/71a8a5be-e7c9-4f98-808d-1ec1d8ff92bc" />
 
-**Parameters: numTrees = 10, maxDepth = 5, maxBins = 32, seed = 42**
+**Model 1 Hyperparameters: numTrees = 10, maxDepth = 5, maxBins = 32, seed = 42**
 
-### Training and Test Error of Distributed Model (Random Forest Classifier)
+### Training and Test Error of Random Forest Classifier
 | Training Error | Validation Error | Test Error |
 | --- | --- | --- |
 | 95.886% | 95.873% | 95.909% | 
@@ -192,15 +195,18 @@ pyspark.ml.classification.RandomForestClassifier
 | Test | FashionReps | FashionReps | Correct |
 | Test | AskReddit | Advice | Incorrect |
 
-## Fitting Analysis of Distributed Model
-
-**Fitting Graph:** The results between our training, validation, and test set for the decision tree based model tend to be pretty similar. Overfitting, typically, can be seen when the model performs well or better on the training set compared to the validation/test set of unseen data where it performs worse since the model hasn't had a chance to get used to new data. The similarity between the poor accuracy of all 3 sets isn't really an indicator our model is overfitting since it's not even fitting well on the training data to begin with. Underfitting occurs when the model is too simple and does not capture the patterns inherent in the text of subreddit posts well enough to predict with good enough accuracy depsite the dataset. This is very accurate to the large error we see in our model across our training, validation, and test sets which creates a clear indication our model tends to underfit the subreddit data. 
 
 ### Results with Different Hyperparameters
-**Hyperparameters: maxDepth = 3, maxBins = 16, impurity = "entropy", seed = 42**
+**Model 2 RF Hyperparameters: numTrees = 15, maxDepth = 5, maxBins = 32, seed = 42**
 | Training Error | Validation Error | Test Error |
 | --- | --- | --- |
-| 97.915% | 97.926% | 97.837% |
+| 95.862% | 95.877% | 95.874% |
+
+**Model 3 Decision Tree Hyperparameters: maxDepth = 3, maxBins = 16, impurity = "entropy", seed = 42**
+
+|Training Error	| Validation Error|	Test Error|
+| --- | --- | --- |
+|97.915%	|97.926%|	97.837%|
 
 | Dataset Type | Ground Truth Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
@@ -211,21 +217,43 @@ pyspark.ml.classification.RandomForestClassifier
 | Test | apexlegends | apexlegends | Correct |
 | Test | Advice | relationship_advice | Incorrect |
 
-### Interpretation
-The reason our error rates are so high could be due to the fact that we have a large number of labels to classify and the distribution is highly imbalanced (as previously explained in the EDA). Below is a screenshot showing the value counts of unique subreddits in a 0.01% sample. There is a total of 5838 unique subreddits, many of which only has 1 entry. Thus, the error rate of 95% is better than randomly predicting labels. For this sample dataset, the probability of randomly assigning the correct label 1/5838=0.00017
+
+## Analysis of Distributed Model
+
+### Interpretation of High Error Rates
+**Fitting Graph:** The results between our training, validation, and test set for the decision tree-based model tend to be pretty similar. Overfitting, typically, can be seen when the model performs well or better on the training set compared to the validation/test set of unseen data where it performs worse since the model hasn't had a chance to get used to new data. The similarity between the poor accuracy of all 3 sets isn't really an indicator our model is overfitting since it's not even fitting well on the training data to begin with.\
+Underfitting occurs when the model is too simple and does not capture the patterns inherent in the text well enough to predict with good accuracy depsite the dataset, which is similar to what we are seeing here. The high error rates could be due to the fact that we have a large number of labels to classify and the distribution is highly imbalanced (as previously explained in the EDA). Below is a screenshot showing the value counts of unique subreddits in a 0.01% sample. There is a total of 5838 unique subreddits, many of which only has 1 entry. Thus, the error rate of 95% is better than randomly predicting labels. For this sample dataset, the probability of randomly assigning the correct label 1/5838=0.00017
 
 ![temp_df](visualization/temp_df.png)
 
-### Better Model
-Between the two hyperparameters shown, the model that performed best was the initial model. Model 1, implemented a Random Forest approach with 10 trees, and allowed for a larger depth and binning of the data than Model 2 did. Our goal with Model 2 was to view the scale of the effect between the Decision Tree approach and Random Forest approach to see if the RF Model 1 is worth accounting for aspects like multiple trees or a more lenient parameter set for depth and bins. We can clearly see based on the table that Model 1 clearly performs better when implementing the Random Forest approach compared to Model 2's more simplistic case. Despite Model 1 performing better than Model 2, it is also very evident that neither model is performing well at all. In fact we see that for different hyperparameter sets that we tried, regardless of the implementation while accounting for the trade-off with complexity, we struggled to really get an accurate model primarily due to issues with the different subreddit options, various subreddits being incredibly similar in their purpose, and subreddits potentially being split entirely into a validation or test set and missing from the training set.
+### Comparing Different Hyperparameters
+Our two Random Forest classifiers performed similarly despite different hyperparamenter (10 vs. 15 trees). We also tried fitting Decision Trees with different max depths, but Random Forest proved to perform better, although both have bad accuracy. Our motivation was to view the scale of the effect between the Decision Tree approach and Random Forest approach to see if the RF Model is worth accounting for aspects like multiple trees or a more lenient parameter set for depth and bins. We can clearly see based on the table that Model 1&2 clearly performs better when implementing the Random Forest approach compared to Model 3's more simplistic case. For different hyperparameter sets that we tried, regardless of the implementation while accounting for the trade-off with complexity, we struggled to really get an accurate model primarily due to issues with the different subreddit options, various subreddits being incredibly similar in their purpose, and subreddits potentially being split entirely into a validation or test set and missing from the training set. Thus, we have the following Naive Bayes' model.
+
+> We are aware that this is a deviation from the project requirement. Our motivation is simply wanting to see a model with at leat 60% accuracy, and perhaps as an early start to Milestone 4.
+
+### Naive Bayes' Multinomial Model
+[Jupyter Notebook Code]()
+This model shows much better accuracy of approxmiately 61%. We achieved this by filtering the dataset so that only the top 100 subreddits are used for training, and this solved the problem of imbalaced dataset. We also tried different hyperparameters on this model. A smaller smoothing coefficient is supposed to help with underfitting (low accuracy), however, it did not have much affect here as you can see in the below tables.
+
+**Hyperparamter: smoothing = 1.0**
+|Training Error	|	Test Error|
+| --- | --- | 
+|38.75%	|38.56%|
+
+**Hyperparamter: smoothing = 0.1**
+|Training Error	|	Test Error|
+| --- | --- | 
+|38.74%	|38.56%|
+
 
 ### Additional Planned Model Options
-For our next model, we are specifically interested in trying a distributed XGBoost implementation using Spark (SparkXGBClassifier). This is designed to scale to larger datasets, like this reddit data, and may better capture relationships in the text compared to a Decision Tree or Random Forest approach. Since our current models appear to underfit quite drastically, we think XGBoost may improve predictive performance while still taking advantage of distributed computing on Expanse. Our goal is to not just try one model, but for us to be able to create a dynamic implementation wherein tuning different hyperparameters will help us compare different models, some of which may overfit our data while performing well on the training set and other tuned models which could perform worse on the training set but better comparatively on our validation/test set. 
+For our next model, aside from continuing our research with the Naive Bayes' model, we are also interested in trying a distributed XGBoost implementation using Spark (SparkXGBClassifier). This is designed to scale to larger datasets, like this reddit data, and may better capture relationships in the text compared to a Decision Tree or Random Forest approach. Since our current models appear to underfit quite drastically, we think XGBoost may improve predictive performance while still taking advantage of distributed computing on Expanse. Our goal is to not just try one model, but for us to be able to create a dynamic implementation wherein tuning different hyperparameters will help us compare different models, some of which may overfit our data while performing well on the training set and other tuned models which could perform worse on the training set but better comparatively on our validation/test set. 
 
 
 ## Conclusion of Distributed Model
-**Conclusion:** The distributed Spark Decision Tree and Random Forest models were able to successfully run on a the portion of the Reddit dataset we had following our steps for preprocessing, but unfortuantely our overall performance was still relatively low. The results suggest that the models are underfitting, since the training, validation, and testing scores stayed low and very similar to each other. This means the models struggled to learn meaningful patterns to accurately predict subreddits from text alone. This is likely an indication that for the means of our model, classifying from a diverse text-based feature set to predict on a large target set is not very attainable using a Random Forest or Decision Tree model. We also can see that there are quite a bit of subreddits that have are incredibly similar in fucntion and thus have similar posts. As we move forward, this will be a likely issue we continue to see and a true struggle that is evident in these types of complex real, world tasks. High levels of nuance and little to no variation among certain values in the target set make it hard to classify especially on feature sets that are typically unique and subjective. Even though the accuracy was limited, this milestone helped establish a working distributed preprocessing and model pipeline on SDSC Expanse. It also showed that more advanced models and better text features will likely be needed to improve performance in Milestone 4.
+**Conclusion:** The distributed Spark Decision Tree and Random Forest models were able to successfully run on a the portion of the Reddit dataset we had following our steps for preprocessing, but unfortuantely our overall performance was still relatively low. The results suggest that the models are underfitting, since the training, validation, and testing scores stayed low and very similar to each other. This means the models struggled to learn meaningful patterns to accurately predict subreddits from text alone. This is likely an indication that for the means of our model, classifying from a diverse text-based feature set to predict on a large target set is not very attainable using a Random Forest or Decision Tree model. \
+We also can see that there are quite a bit of subreddits that have are incredibly similar in fucntion and thus have similar posts. As we move forward, this will be a likely issue we continue to see and a true struggle that is evident in these types of complex real, world tasks. High levels of nuance and little to no variation among certain values in the target set make it hard to classify especially on feature sets that are typically unique and subjective. Even though the accuracy was limited, this milestone helped establish a working distributed preprocessing and model pipeline on SDSC Expanse. Our Naive Bayes' approach also showed that more advanced models and better text features will likely be needed to improve performance in Milestone 4.
 
-**Potential Improvements:** Despite our best efforts to select different hyperparameters, the model struggles to accurately predict subreddits. The issue can primarily be pinpointed down to the incredibly large amounts of subreddits that show up in our dataset even though we tried to implement a threshold. Since some subreddits show up at a comparitively larger proportion than others and most show up very few times, our training set simply does not have the balanced distribution that we would like to be able to predict with a lower error. By chance when splitting with the amount of subreddits, it's likely many subreddits are not included as options from our training set and will ultimately fail in validation and test. A fix would be to require every subreddit has at least 3 entries when splitting our training, validation, and test sets. Additionally, there are too many subreddit options for which our model is trying to pick the best one on, many subreddits being very similar. A better way to be able to improve our model while maintaining its large size would be to only work on the largest subset of perhaps 10 or 20 of the subreddits with the most posts. This would of course alter the predictive capacity of our model (limiting the options from which our model will predict), but also has the potential to improve the models prediction accuracy by focusing on the subreddits that have more data and learnable patterns. 
+**Potential Improvements:** Despite our best efforts to select different hyperparameters, the model struggles to accurately predict subreddits. The issue can primarily be pinpointed down to the incredibly large amounts of subreddits that show up in our dataset even though we tried to implement a threshold. Since some subreddits show up at a comparitively larger proportion than others and most show up very few times, our training set simply does not have the balanced distribution that we would like to be able to predict with a lower error. By chance when splitting with the amount of subreddits, it's likely many subreddits are not included as options from our training set and will ultimately fail in validation and test. A fix would be to require every subreddit has at least 3 entries when splitting our training, validation, and test sets. Additionally, there are too many subreddit options for which our model is trying to pick the best one on, many subreddits being very similar. A better way to be able to improve our model while maintaining its large size would be to only work on the largest subset of the top 10, 20, or 100 subreddits with the most posts. This would of course alter the predictive capacity of our model (limiting the options from which our model will predict), but also has the potential to improve the models prediction accuracy by focusing on the subreddits that have more data and learnable patterns. 
 
 **Distributed Computing:** Leveraging various independent computing nodes to handle reading, processing, training, and evaluating our dataset is a necessary aspect to working with a dataset of this size. Since many of our normal machines cannot run these steps locally based on the size of this dataset, splitting up the tasks across different resources allows these resources to not just be set up to handle data of this size but also run them concurrently across machines. In other words, while its possible to scale our data to a processor that can handle the size, splitting up the task across various nodes will increase computational efficiency by allowing various different nodes to try to do that same work in a faster timeframe than if everything was done individually and sequentially from one large resource.
