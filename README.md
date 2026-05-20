@@ -197,10 +197,10 @@ pyspark.ml.classification.RandomForestClassifier
 **Fitting Graph:** The results between our training, validation, and test set for the decision tree based model tend to be pretty similar. Overfitting, typically, can be seen when the model performs well or better on the training set compared to the validation/test set of unseen data where it performs worse since the model hasn't had a chance to get used to new data. The similarity between the poor accuracy of all 3 sets isn't really an indicator our model is overfitting since it's not even fitting well on the training data to begin with. Underfitting occurs when the model is too simple and does not capture the patterns inherent in the text of subreddit posts well enough to predict with good enough accuracy depsite the dataset. This is very accurate to the large error we see in our model across our training, validation, and test sets which creates a clear indication our model tends to underfit the subreddit data. 
 
 ### Results with Different Hyperparameters
-**Hyperparameters: numTrees = 15, maxDepth = 5, maxBins = 32, seed = 42**
+**Hyperparameters: maxDepth = 3, maxBins = 16, impurity = "entropy", seed = 42**
 | Training Error | Validation Error | Test Error |
 | --- | --- | --- |
-| 95.862% | 95.877% | 95.874% |
+| 97.915% | 97.926% | 97.837% |
 
 | Dataset Type | Ground Truth Subreddit | Parameterized Model Predicted Subreddit | Accuracy |
 | --- | --- | --- | --- |
@@ -210,6 +210,9 @@ pyspark.ml.classification.RandomForestClassifier
 | Validation | teenagers | AskReddit | Incorrect |
 | Test | apexlegends | apexlegends | Correct |
 | Test | Advice | relationship_advice | Incorrect |
+
+### Better Model
+Between the two hyperparameters shown, the model that performed best was the initial model. Model 1, implemented a Random Forest approach with 10 trees, and allowed for a larger depth and binning of the data than Model 2 did. Our goal with Model 2 was to view the scale of the effect between the Decision Tree approach and Random Forest approach to see if the RF Model 1 is worth accounting for aspects like multiple trees or a more lenient parameter set for depth and bins. We can clearly see based on the table that Model 1 clearly performs better when implementing the Random Forest approach compared to Model 2's more simplistic case. Despite Model 1 performing better than Model 2, it is also very evident that neither model is performing well at all. In fact we see that for different hyperparameter sets that we tried, regardless of the implementation while accounting for the trade-off with complexity, we struggled to really get an accurate model primarily due to issues with the different subreddit options, various subreddits being incredibly similar in their purpose, and subreddits potentially being split entirely into a validation or test set and missing from the training set.
 
 ### Additional Planned Model Options
 For our next model, we are specifically interested in trying a distributed XGBoost implementation using Spark (SparkXGBClassifier). This is designed to scale to larger datasets, like this reddit data, and may better capture relationships in the text compared to a Decision Tree or Random Forest approach. Since our current models appear to underfit quite drastically, we think XGBoost may improve predictive performance while still taking advantage of distributed computing on Expanse. Our goal is to not just try one model, but for us to be able to create a dynamic implementation wherein tuning different hyperparameters will help us compare different models, some of which may overfit our data while performing well on the training set and other tuned models which could perform worse on the training set but better comparatively on our validation/test set. 
