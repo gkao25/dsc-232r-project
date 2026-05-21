@@ -229,7 +229,7 @@ Underfitting occurs when the model is too simple and does not capture the patter
 ### Comparing Different Hyperparameters
 Our two Random Forest classifiers performed similarly despite different hyperparamenter (10 vs. 15 trees). We also tried fitting Decision Trees with different max depths, but Random Forest proved to perform better, although both have bad accuracy. Our motivation was to view the scale of the effect between the Decision Tree approach and Random Forest approach to see if the RF Model is worth accounting for aspects like multiple trees or a more lenient parameter set for depth and bins. We can clearly see based on the table that Model 1&2 clearly performs better when implementing the Random Forest approach compared to Model 3's more simplistic case. For different hyperparameter sets that we tried, regardless of the implementation while accounting for the trade-off with complexity, we struggled to really get an accurate model primarily due to issues with the different subreddit options, various subreddits being incredibly similar in their purpose, and subreddits potentially being split entirely into a validation or test set and missing from the training set. Thus, we have the following Naive Bayes' model.
 
-> We are aware that this is a deviation from the project requirement. Our motivation is simply wanting to see a model with at leat 60% accuracy, and perhaps as an early start to Milestone 4.
+> We are aware that this is a deviation from the project requirement. Our motivation is simply wanting to see a model with at least 60% accuracy, and perhaps as an early start to Milestone 4.
 
 ### Naive Bayes' Multinomial Model
 [Jupyter Notebook Code](https://github.com/gkao25/dsc-232r-project/blob/main/training2.ipynb)
