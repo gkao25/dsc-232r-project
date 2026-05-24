@@ -258,3 +258,54 @@ We also can see that there are quite a bit of subreddits that have are incredibl
 **Potential Improvements:** Despite our best efforts to select different hyperparameters, the model struggles to accurately predict subreddits. The issue can primarily be pinpointed down to the incredibly large amounts of subreddits that show up in our dataset even though we tried to implement a threshold. Since some subreddits show up at a comparitively larger proportion than others and most show up very few times, our training set simply does not have the balanced distribution that we would like to be able to predict with a lower error. By chance when splitting with the amount of subreddits, it's likely many subreddits are not included as options from our training set and will ultimately fail in validation and test. A fix would be to require every subreddit has at least 3 entries when splitting our training, validation, and test sets. Additionally, there are too many subreddit options for which our model is trying to pick the best one on, many subreddits being very similar. A better way to be able to improve our model while maintaining its large size would be to only work on the largest subset of the top 10, 20, or 100 subreddits with the most posts. This would of course alter the predictive capacity of our model (limiting the options from which our model will predict), but also has the potential to improve the models prediction accuracy by focusing on the subreddits that have more data and learnable patterns. 
 
 **Distributed Computing:** Leveraging various independent computing nodes to handle reading, processing, training, and evaluating our dataset is a necessary aspect to working with a dataset of this size. Since many of our normal machines cannot run these steps locally based on the size of this dataset, splitting up the tasks across different resources allows these resources to not just be set up to handle data of this size but also run them concurrently across machines. In other words, while its possible to scale our data to a processor that can handle the size, splitting up the task across various nodes will increase computational efficiency by allowing various different nodes to try to do that same work in a faster timeframe than if everything was done individually and sequentially from one large resource.
+
+## Dimensionality Reducton Model
+**Dimension Reduced Model: Principal Component Analysis (PCA)**
+
+Implementation:
+*insert notebook*
+
+```python
+pyspark.ml.feature.PCA
+```
+
+### Dimensionality Reduction (Clustering, Visualization/Interpretation, Supervised Model)
+
+*Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets.*
+
+**Multiple Executors Used:**\
+*insert proof*
+
+### Training and Test Error of PCA Model
+| Training Error | Validation Error | Test Error |
+| --- | --- | --- |
+| % | % | % | 
+
+### PCA Explained Variance Analysis
+
+*Note: No clustering quality since dimensionality reduction did not leverage clustering*
+
+### Analysis
+**Fitting Graph:** 
+
+**Potential Improvements/Additional Models:**
+
+**Effect of Dimensionality Reduction:**
+
+### Conclusion
+**2nd Model:**
+
+**Improvements:**
+
+### Prediction Analysis
+| Dataset Type | Prediction | Truth | Prediction Type/Justification |
+| --- | --- | --- | --- |
+| Test | Estimate | Value | Correct: The predicted value matches with the subreddit's true value |
+| Test | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
+| Test | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
+
+### Speedup Analysis
+| Executors | Time (sec) | Speedup | Efficiency |
+| --- | --- | --- | --- |
+| 1 | X | 1.00x | 100% |
+| 15 | Y | (X/Y) | (X/Y)/15 |
