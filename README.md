@@ -309,3 +309,19 @@ pyspark.ml.feature.PCA
 | --- | --- | --- | --- |
 | 1 | X | 1.00x | 100% |
 | 15 | Y | (X/Y) | (X/Y)/15 |
+
+## Written Report
+
+### Introduction
+As a group of students we find ourselves frequenting forum pages, like Reddit, in every day lives whether that be for reasons such as academic help, asking for advice, or just finding a good recipe for dinner. Forums like these are incredibly important in bridging the gap of physical distances and bringing like minded people together as collaborative spaces of discussion in finding that help and understanding that we may require from our technologically, online world.
+### Figures
+
+### Methods
+
+### Results
+
+### Discussion
+
+### Conclusion
+
+### Statement of Collaboration
