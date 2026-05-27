@@ -277,9 +277,11 @@ pyspark.ml.feature.PCA
 *insert proof*
 
 ### Training and Test Error of PCA Model
-| Training Error | Validation Error | Test Error |
+| PCA Model | Training Error | Test Error |
 | --- | --- | --- |
-| % | % | % | 
+| PCA Baseline | 79.69% | 79.81% | 
+| PCA + XGBoost | 68.36% | 68.39% |
+| PCA + Logistic Regression | 92.18% | 92.16% |
 
 ### PCA Explained Variance Analysis
 
@@ -315,10 +317,18 @@ pyspark.ml.feature.PCA
 ### Introduction
 As a group of students we find ourselves frequenting forum pages, like Reddit, in every day lives whether that be for reasons such as academic help, asking for advice, or just finding a good recipe for dinner. Forums like these are incredibly important in bridging the gap of physical distances and bringing like minded people together as collaborative spaces of discussion in finding that help and understanding that we may require from our technologically, online world. The problem: which communities and forums are right for the questions, help needed, and posts we have in mind? The ability of this fascinating problem to relate to all four of our group members with different interests, ideas, and experiences helped direct our project goals to looking into and working on a model that would help both forum hosts in understanding its user's platform experience but more importantly user's themselves to find the communities that best fit their interests and needs. Building an efficient predictive classifier would help forums like Reddit be able to identify aspects of their platform in areas such as subreddit suggestion so users can make posts or navigate through forums they find interesting. An accurate predictive model would also be helpful for users to understand popular subreddits that would have a broader community to help them relate and find the appropriate and best place to make posts that other users would frequent by knowing where that post should go. As online communities grow and people find it harder to relate to the environment around them, it forum sites like Reddit become more important for users to feel connected. That's why it's important for them to expand their hosting capabilities to develop algorithms and models that serve the purposes of the platforms put forth to users to find people around the world that share their ideas, experiences, and interests.
 
-The dataset we are using stitches together different periods of Reddit post information such as the title, text, and subreddit that combined provides over 100GB of information. A dataset of this side is necessary to account for posts that may be more or less common during certain periods of time and can help generalize by providing more data to train on for a potentially more acccurate model. Processing and working with data at this scale is not feasible or scalable for modern everyday computers like the ones we use. That's where distributed computing comes in. Using SDSC Expanse we are able to leverage multiple cores of computer processors each allocated with a certain amount of memory all connected via a driver node. This improves on the single processor architecture where our data can be partitioned and worked on across multiple different nodes. Spark helps accomodate and support this structure of passing our data across these nodes so that we can process, understand, train, and evaluatre a dataset of this size despite the limitations of our everyday machines. 
+The dataset we are using stitches together different periods of Reddit post information such as the title, text, and subreddit that combined provides over 100GB of information. A dataset of this side is necessary to account for posts that may be more or less common during certain periods of time and can help generalize by providing more data to train on for a potentially more acccurate model. Processing and working with data at this scale is not feasible or scalable for modern everyday computers like the ones we use. That's where distributed computing comes in. Using SDSC Expanse we are able to leverage multiple cores of computer processors each allocated with a certain amount of memory all connected via a driver node. This improves on the single processor architecture where our data can be partitioned and worked on across multiple different nodes. Spark helps accomodate and support this structure of passing our data across these nodes so that we can process, understand, train, and evaluatre a dataset of this size despite the limitations of our everyday machines. Without Spark, it would be impossible to deal with these issues of sclability on any of our own one machines especialy in coordinating the work done by different nodes on various subsets of the dataset.
 ### Figures
 
 ### Methods
+Summary of methods employed
+#### Data Exploration
+
+#### Preprocessing (Spark)
+
+#### Model 1 (Random Forest)
+
+#### Model 2 (PCA with XGBoost)
 
 ### Results
 | Model | Training Error | Validation Error | Test Error |
@@ -327,8 +337,12 @@ The dataset we are using stitches together different periods of Reddit post info
 | Random Forest (2) | 95.862% | 95.877% | 95.874% |
 | Random Forest (3) | 97.915%	| 97.926% | 97.837% |
 | Naive Bayes (1) | 38.75%	| NA | 38.56%|
-|Naive Bayes (2) | 38.74%	| NA | 38.56% |
-| PCA | % | % | % | 
+| Naive Bayes (2) | 38.74%	| NA | 38.56% |
+| Naive Bayes (3) | 42.76% | NA | 42.85% |
+| TF-IDF Naive Bayes | 49.29% | NA | 49.32% |
+| PCA Baseline | 79.69% | NA | 79.81% | 
+| PCA + XGBoost | 68.36% | NA | 68.39% |
+| PCA + Logistic Regression | 92.18% | NA | 92.16% |
 ### Discussion
 
 ### Conclusion
