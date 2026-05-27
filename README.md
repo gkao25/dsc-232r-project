@@ -274,7 +274,7 @@ pyspark.ml.feature.PCA
 *Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets.*
 
 **Multiple Executors Used:**\
-*insert proof*
+<img width="527" height="56" alt="Screenshot 2026-05-26 at 8 48 39 PM" src="https://github.com/user-attachments/assets/3292dcd6-8b44-4bc4-a3c5-9d93e408959e" />
 
 ### Training and Test Error of PCA Model
 | PCA Model | Training Error | Test Error |
@@ -300,11 +300,17 @@ pyspark.ml.feature.PCA
 **Improvements:**
 
 ### Prediction Analysis
-| Dataset Type | Prediction | Truth | Prediction Type/Justification |
+| Model Type | Prediction | Truth | Prediction Type/Justification |
 | --- | --- | --- | --- |
-| Test | Estimate | Value | Correct: The predicted value matches with the subreddit's true value |
-| Test | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
-| Test | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
+| PCA Baseline | 2007scape | 2007scape | Correct: The predicted value matches with the subreddit's true value |
+| PCA Baseline | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
+| PCA Baseline | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
+| PCA + XGBoost | ADHD | ADHD | Correct: The predicted value matches with the subreddit's true value |
+| PCA + XGBoost | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
+| PCA + XGBoost | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
+| PCA + Logistic Regression | Amazon_Deals_ | Amazon_Deals_ | Correct: The predicted value matches with the subreddit's true value |
+| PCA + Logistic Regression | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
+| PCA + Logistic Regression | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
 
 ### Speedup Analysis
 | Executors | Time (sec) | Speedup | Efficiency |
@@ -321,9 +327,61 @@ The dataset we are using stitches together different periods of Reddit post info
 ### Figures
 
 ### Methods
-Summary of methods employed
+Summary of methods employed.
 #### Data Exploration
-
+Data exploration included returning a breakdown of the total number of entries/posts within our dataset which came down to 654,221,435 using 
+```python
+df.count()
+```
+across the data. We also used functions like 
+```python
+df.columns() 
+df.info()
+df.describe()
+df.printSchema()
+```
+to get a clear understanding of the the way the dataset was structured and their types which summarized our dataset as 6 columns: `title`, `post_id`, `over_18`, `subreddit`, `link_flair_text`, `self_text`. Moving on, we incorporated 
+```python
+df.show(5)
+```
+which provided the first 5 entries of the dataset for subreddits, `TheFriendlyHermit`, `MakeNewFriendsHere`, `ukraine`, `knives`, `IThinkYouShouldLeave`. This stage also included finding the number of missing/empty rows in our dataset with
+```python
+df.select([
+    count(when(col(c).isNull() | (col(c) == ""), 1)).alias(c)
+    for c in df.columns
+])
+```
+showing for each column the number of rows that contained null or missing values: `title` (336), `post_id` (17,933), `over_18` (20,405), `subreddit` (21,505), `link_flair_text` (425,449,504), `self_text` (345,790,643). We viewed the top 20 subreddits with
+```python
+df.groupBy("subreddit") \
+  .count() \
+  .orderBy(col("count").desc()) \
+  .show(20, truncate=False)
+```
+that ultimately provided the following table: 
+| subreddit | count |
+| --- | --- |
+|AskReddit|6139237|
+|d-rtyk-kp-ls|3501877|
+|G-ySn-pch-t|3095930|
+|d-rtyr4r|3029756|
+|j-rkb-dss|2341773|
+|FreeKarma4U|2284238|
+|teenagers|2191354|
+|D-rtySn-pch-t|1895438|
+|memes|1686406|
+|AutoNewspaper|1571969|
+|-nlyf-nsg-rls101|1454296|
+|relationship_advice|1448498|
+|M-ss-v-C-ck|1424096|
+|c-ck|1303653|
+|g-n-w-ld|1302379|
+|F-mB-ys|1300658|
+|PokemonGoRaids|1289534|
+|NSFW_Tr-b-t-s|1217304|
+|d-rtyp-np-ls|1213695|
+|FreeKarma4You|1208657|
+*Note: NSFW subreddits have been altered*
 #### Preprocessing (Spark)
 
 #### Model 1 (Random Forest)
