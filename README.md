@@ -416,7 +416,9 @@ that ultimately provided the following table:
 ### Statement of Collaboration
 |Name| Title| Contribution|
 |---|---|---|
-|Gloria Kao|x|x|
-|Mahir Oza|x|x|
-|Ali Karim|x|x|
-|Michael Nodini|x|x|
+|Gloria Kao|Team Leader/Project Manager|x|
+|Mahir Oza|Writer|x|
+|Ali Karim|Coder|x|
+|Michael Nodini|Coder|x|
+
+*Note: All Team Members had secondary contributions to each task - Title & Contributions listed pertain to primary tasks and majority functions performed*
