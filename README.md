@@ -264,7 +264,6 @@ We also can see that there are quite a bit of subreddits that have are incredibl
 
 ## Dimensionality Reduction Model
 **Dimension Reduced Model: Principal Component Analysis (PCA)**
-
 Implementation:
 *insert notebook*
 
@@ -273,6 +272,7 @@ pyspark.ml.feature.PCA
 ```
 
 ### Dimensionality Reduction (Clustering, Visualization/Interpretation, Supervised Model)
+Our approach to implementing a dimension reduced model was to employ a supervised modeling approach by training our model on a set of reduced-dimension features. As part of our dimensionality reduction we also incoporated a TF-IDF vectorizer on our model inputs to focus our model training on the words that are most important, common, and valuable to subreddit posts and allow the model to ignore text that does not contribute as strongly to a subreddit. This focuses the model on the most important aspects of a post that contribute to subreddit determination to find and use commonality among posts and minimizing our models idea of variance that other methods would be unable to acknowledge and work upon. 
 
 *Note: Model successfully run through SDSC Expanse to avoid local issues for large datasets.*
 
@@ -286,12 +286,19 @@ pyspark.ml.feature.PCA
 | PCA + XGBoost | 68.36% | 68.39% |
 | PCA + Logistic Regression | 92.18% | 92.16% |
 
+For all 3 employments of the PCA models, the training and test error for each model is relatively very similar. However, despite all 3 models performing relatively poorly, we can see clear differences between the models. The best performing model is PCA with XGBoost, followed by the baseline PCA, and worst of all was PCA with logistic regression. 
+
 ### PCA Explained Variance Analysis
+| PCA Model | Explained Variance | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] |
+| --- | --- | --- |
+| PCA Baseline | EV | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] | 
+| PCA + XGBoost | EV | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] |
+| PCA + Logistic Regression | EV | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] |
 
 *Note: No clustering quality since dimensionality reduction did not leverage clustering*
 
 ### Analysis
-**Fitting Graph:** 
+**Fitting Graph:** Across all 3 PCA models we can see very close similarities between each model's training and test errors. For example, the PCA Baseline model had a training error of 79.69% while the test error was only 0.12% worse performing with a 79.81% inaccuracy. We see very small difference between training and test error for the other two models as well. This indifference between the training and test sets along with all 3 PCA models performing pretty badly (all worse than 50% error) lead to a conclusion of our models underfitting our data. PCA modeling on this type of data is unable to accurately identify patterns and trends within posts from the training set and when passed on the test set can really only perform well on posts similar to what it could accurately identify in the training set and thus performs equally as poorly. 
 
 **Potential Improvements/Additional Models:**
 
