@@ -289,11 +289,13 @@ Our approach to implementing a dimension reduced model was to employ a supervise
 For all 3 employments of the PCA models, the training and test error for each model is relatively very similar. However, despite all 3 models performing relatively poorly, we can see clear differences between the models. The best performing model is PCA with XGBoost, followed by the baseline PCA, and worst of all was PCA with logistic regression. 
 
 ### PCA Explained Variance Analysis
-| PCA Model | Explained Variance | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] |
+| PCA Model | Explained Variance | Initial 10 Components |
 | --- | --- | --- |
-| PCA Baseline | EV | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] | 
-| PCA + XGBoost | EV | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] |
-| PCA + Logistic Regression | EV | [PC1, PC2, PPC3, PC4, PC5, PC6, PC7, PC8, PC9, PC10] |
+| PCA Baseline | 0.5782 | [0.084247, 0.073207, 0.047140, 0.044247, 0.030013, 0.027319, 0.023568, 0.017341, 0.016214, 0.011690] | 
+| PCA + XGBoost | 0.6248 | [0.236053, 0.041906, 0.031039, 0.027319, 0.022965, 0.021760, 0.019578, 0.014357, 0.013182, 0.012080] |
+| PCA + Logistic Regression | 0.5813 | [0.283320, 0.039514, 0.030347, 0.028484, 0.026008, 0.017901, 0.016024, 0.015791, 0.013440, 0.010368] |
+
+Across all 3 models, only 58-62% of the variance can be explained by the setups employed showing a medium preservation of original information with about 38-42% of the variance discarded. This infroms us that our models are likely disregarding and ignoring useful structures that could help identify and discriminate across subreddits. This furthers our earlier conclusions that our data is highly complex stemming from large variation in posts within each subreddit, non-linear relationships between features and subreddit, and perhaps even some aspects of the features still leveraged performing weakly. While the components for the PCA Baseline model are all somewhat similar we see the first component (PC1) for the XGBoost and Logistic Regression implementation of the PCA models are far greater than the rest of the components, 23.61% and 28.33% respectively. This means these 2 models have a large portion of the variance caputured by the first components in relation to the other 9 implying the transformed feature space has become concentrated along a singular direction. This can be due to strong correlation among a feature, redundancy, or information across axes being tightly compressed. 
 
 *Note: No clustering quality since dimensionality reduction did not leverage clustering*
 
@@ -312,21 +314,16 @@ For all 3 employments of the PCA models, the training and test error for each mo
 ### Prediction Analysis
 | Model Type | Prediction | Truth | Prediction Type/Justification |
 | --- | --- | --- | --- |
-| PCA Baseline | 2007scape | 2007scape | Correct: The predicted value matches with the subreddit's true value |
-| PCA Baseline | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
-| PCA Baseline | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
-| PCA + XGBoost | ADHD | ADHD | Correct: The predicted value matches with the subreddit's true value |
-| PCA + XGBoost | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
-| PCA + XGBoost | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
-| PCA + Logistic Regression | Amazon_Deals_ | Amazon_Deals_ | Correct: The predicted value matches with the subreddit's true value |
-| PCA + Logistic Regression | Estimate | Value | False Positive:  Since the subreddit was not identified correctly by the predicted value, the estimate is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
-| PCA + Logistic Regression | Estimate | Value | False Negative: Despite the predicion being wrong for the subreddit classification, we consider the predicted value the FP but the absence of the true value in this case is considered the FN because it was not selected as the estimate |
+| PCA + XGBoost | ADHD | ADHD | Correct (ADHD): The predicted value (`ADHD`) matches with the subreddit's true value (`ADHD`) |
+| PCA + XGBoost | relationship_advice | 2007scape | False Positive (relationship_advice):  Since the subreddit (`2007scape`) was not identified correctly by the predicted value (`relationship_advice`), the estimate (`relationship_advice`) is considered a False Positive since it was incorrect and is the value the subreddit is being identified with |
+| PCA + XGBoost | teenagers | 2007scape | False Negative (2007scape): Despite the prediction (`teenagers`) being wrong for the subreddit classification, we consider the predicted value (`teenagers`) the FP but the absence of the true value (`2007scape`) in this case is considered the FN because it was not selected as the estimate |
 
 ### Speedup Analysis
 | Executors | Time (sec) | Speedup | Efficiency |
 | --- | --- | --- | --- |
-| 1 | X | 1.00x | 100% |
-| 15 | Y | (X/Y) | (X/Y)/15 |
+| 1 | 8494.26 | 1.00x | 100% |
+| 4 | 6422.91 | 1.32x | 33.06% |
+| 7 | 6060.01 | 1.40x | 20.02% |
 
 ## Written Report
 
