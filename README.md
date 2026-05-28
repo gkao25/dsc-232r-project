@@ -264,6 +264,7 @@ We also can see that there are quite a bit of subreddits that have are incredibl
 
 ## Dimensionality Reduction Model
 **Dimension Reduced Model: Principal Component Analysis (PCA)**
+
 Implementation:
 *insert notebook*
 
