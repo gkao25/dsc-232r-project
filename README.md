@@ -235,7 +235,7 @@ Our two Random Forest classifiers performed similarly despite different hyperpar
 > We are aware that this is a deviation from the project requirement. Our motivation is simply wanting to see a model with at least 60% accuracy, and perhaps as an early start to Milestone 4.
 
 ### Naive Bayes' Multinomial Model
-[Jupyter Notebook Code](https://github.com/gkao25/dsc-232r-project/blob/main/training2.ipynb)
+Implementation: [Jupyter Notebook Code](https://github.com/gkao25/dsc-232r-project/blob/main/training2.ipynb)
 
 This model shows much better accuracy of approxmiately 61%. We achieved this by filtering the dataset so that only the top 100 subreddits are used for training, and this solved the problem of an imbalanced dataset. We also tried different hyperparameters on this model. A smaller smoothing coefficient is supposed to help with underfitting (low accuracy), however, it did not have much effect here, as you can see in the tables below.
 
@@ -329,9 +329,10 @@ Across all 3 models, only 58-62% of the variance can be explained by the setups 
 ## Written Report
 
 ### Introduction
-As a group of students we find ourselves frequenting forum pages like Reddit in every day lives, whether that be for reasons such as academic help, asking for advice, or just finding a good recipe for dinner. Forums like these are incredibly important in bridging the gap of physical distances and bringing like minded people together as collaborative spaces of discussion in finding the help and understanding that we may require from our technologically online world. The problem: which communities and forums are right for the questions, help needed, and posts we have in mind? The ability of this fascinating problem to relate to all four of our group members with different interests, ideas, and experiences helped direct our project goals to looking into and working on a model that would help both forum hosts in understanding its user's platform experience but more importantly, users themselves to find the communities that best fit their interests and needs. Building an efficient predictive classifier would help forums like Reddit be able to identify aspects of their platform in areas such as subreddit suggestion so users can make posts or navigate through forums they find interesting. An accurate predictive model would also be helpful for users to understand popular subreddits that would have a broader community to help them relate and find the appropriate and best place to make posts that other users would frequent by knowing where that post should go. As online communities grow and people find it harder to relate to the environment around them, it forum sites like Reddit become more important for users to feel connected. That's why it's important for them to expand their hosting capabilities to develop algorithms and models that serve the purposes of the platforms put forth to users to find people around the world that share their ideas, experiences, and interests.
+As a group of students we find ourselves frequenting forum pages like Reddit in every day lives, whether that be for reasons such as academic help, asking for advice, or just finding a good recipe for dinner. Forums like these are incredibly important in bridging the gap of physical distances and bringing like minded people together as collaborative spaces of discussion in finding the help and understanding that we may require from our technologically online world. The problem: which communities and forums are right for the questions, help needed, and posts we have in mind? This problem has a fascinating ability to relate to all four of our group members with different interests, ideas, and experiences. It helped direct our project goals to develop a model that would help forum hosts in understanding its user's platform experience, and more importantly, assist users themselves to find the communities that best fit their interests and needs. Building an efficient predictive classifier would help forums like Reddit to identify aspects of their platform in areas such as subreddit suggestion so users can make posts or navigate through forums they find interesting. An accurate predictive model would also be useful for users to understand popular subreddits that would have a broader community to help them relate and find the most appropriate place to make posts that other users would frequent by knowing where that post should go. As online communities grow and people find it harder to navigate the environment, forum sites like Reddit become more important for users to feel connected. That is why it is important for them to expand their hosting capabilities to develop algorithms and models that serve the purposes of the platforms put forth -- to find people around the world that share their ideas, experiences, and interests.
 
-The dataset we are using stitches together different periods of Reddit post information such as the title, text, and subreddit that combined provides over 100GB of information. A dataset of this side is necessary to account for posts that may be more or less common during certain periods of time and can help generalize by providing more data to train on for a potentially more accurate model. Processing and working with data at this scale is not feasible or scalable for modern everyday computers like the ones we use. That's where distributed computing comes in. Using SDSC Expanse we are able to leverage multiple cores of computer processors each allocated with a certain amount of memory all connected via a driver node. This improves on the single-processor architecture where our data can be partitioned and worked on across multiple different nodes. Spark helps accomodate and support this structure of passing our data across these nodes so that we can process, understand, train, and evaluatre a dataset of this size despite the limitations of our everyday machines. Without Spark, it would be impossible to deal with these issues of sclability on any of our own one machines especialy in coordinating the work done by different nodes on various subsets of the dataset.
+The dataset we are using stitches together different periods of Reddit post information such as the title, text, and subreddit, and when combined, they provides over 100GB of information. A dataset of this size is necessary to account for posts that may be more or less common during certain periods of time, and can help generalize by providing more data to train on for a potentially more accurate model. Processing and working with data at this scale is not feasible or scalable for modern everyday computers like the ones we use, and this is where distributed computing comes in. Using SDSC Expanse, we are able to leverage multiple cores of computer processors each allocated with a certain amount of memory all connected via a driver node. This improves the single-processor architecture where our data can be partitioned and worked on across multiple different nodes. Spark helps accomodate and support this structure, passing our data across these nodes so that we can process, understand, train, and evaluatre a dataset of this size despite the limitations of our everyday machines. Without Spark, it would be impossible to deal with these issues of sclability on any of our own one machines especialy in coordinating the work done by different nodes on various subsets of the dataset.
+
 ### Figures
 
 ### Methods
@@ -359,7 +360,7 @@ df.select([
     for c in df.columns
 ])
 ```
-showing for each column the number of rows that contained null or missing values: `title` (336), `post_id` (17,933), `over_18` (20,405), `subreddit` (21,505), `link_flair_text` (425,449,504), `self_text` (345,790,643). We viewed the top 20 subreddits with
+which shows the number of rows that contained null or missing values for each column feature: `title` (336), `post_id` (17,933), `over_18` (20,405), `subreddit` (21,505), `link_flair_text` (425,449,504), `self_text` (345,790,643). We viewed the top 20 subreddits with
 ```python
 df.groupBy("subreddit") \
   .count() \
@@ -390,35 +391,118 @@ that ultimately provided the following table:
 |d-rtyp-np-ls|1213695|
 |FreeKarma4You|1208657|
 *Note: NSFW subreddits have been altered*
+
 #### Preprocessing (Spark)
+Our first step to preprocessing is filtering out the unwanted NSFW subreddit entries, and entries with empty or deleted post cotent. 
+```python
+filtered_df = df.filter(col("over_18")==False)\
+                .filter(col("self_text").isNotNull() & 
+                        (col("self_text") != "") & 
+                        (col("self_text") != "[removed]") & 
+                        (col("self_text") != "[deleted]"))
+```
+The filtered data size is 97,950,710, which is around 15% of the original dataset. We then tokenized and enocded the text features `title` and `self_text` using the following package with BERT pretrained tokenizer. 
+```python
+from transformers import AutoTokenizer
+# load tokenizer
+tokenizer = AutoTokenizer.from_pretrained(
+    "bert-base-uncased",
+    cache_dir=hf_cache,
+    token=False
+)
+```
+Another version of tokenization is done using the RegexTokenizer. Because the tokenizer is not pretrained, it requires removing the stopwords and hashing (similar to encoding but one way).
+```python
+pyspark.ml.feature.RegexTokenizer
+pyspark.ml.feature.StopWordsRemover
+pyspark.ml.feature.HashingTF
+```
+Finally, we encoded the `subreddit` label and drop all the unwanted features, keeping only the target `subreddit` label and text features `title` and `self_text`, which done through pyspark ML packages with easy-to-use fit and transform functions.
+```python
+pyspark.ml.feature.StringIndexer
+```
 
 #### Model 1 (Random Forest)
+We divided our filtered and preprocessed dataset into 70-15-15 for training, validation, and test sets. Our first distributed model was Random Forest:
+```python
+from pyspark.ml.classification import DecisionTreeClassifier, RandomForestClassifier
+# load model with specified hyperparameters
+rf = RandomForestClassifier(
+    labelCol="label",
+    featuresCol="features",
+    numTrees=10,
+    maxDepth=5,
+    maxBins=32,
+    seed=42
+)
+# train/fit model
+rf_model = rf.fit(train_df)
+# predictions
+rf_train_predictions = rf_model.transform(train_df)
+rf_val_predictions = rf_model.transform(val_df)
+rf_test_predictions = rf_model.transform(test_df)
+```
+Evaluation results with different hyperparameters are listed in a later section.
+
+#### Model 1.5 (Naive Bayes')
+We also explored building a Naive Bayes' model, which is commonly used for multinomial label classification problems like our project. 
+```python
+pyspark.ml.classification.NaiveBayes
+```
+The filtered dataset went through a pipeline of regex tokenizer, removing stop words, hashing, and string label encoder.
+```python
+# pipeline 
+tokenizer = RegexTokenizer(inputCol="self_text", outputCol="words", pattern="\\W+")
+remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
+hashingTF = HashingTF(inputCol="filtered_words", outputCol="features", numFeatures=5000)
+label_indexer = StringIndexer(inputCol=TARGET_COL, outputCol="label", handleInvalid="skip")
+# Naive Bayes 
+nb = NaiveBayes(featuresCol="features", labelCol="label", smoothing=0.1, modelType="multinomial")
+
+pipeline = Pipeline(stages=[tokenizer, remover, hashingTF, label_indexer, nb])
+```
 
 #### Model 2 (PCA with XGBoost)
+This model was built through a similar pipeline as Model 1.5, just with PCA added. Below shows all the packages used. 
+```python
+from pyspark.ml.feature import (
+    RegexTokenizer,
+    StopWordsRemover,
+    HashingTF,
+    StringIndexer,
+    PCA
+)
+from xgboost.spark import SparkXGBClassifier
+```
 
 ### Results
+The following table shows the error rates of all the models we trained. Models of the same type but with different numbers indicate different hyperparameters were used. 
 | Model | Training Error | Validation Error | Test Error |
 | --- | --- | --- | --- |
 | Random Forest (1) | 95.886% | 95.873% | 95.909% |
 | Random Forest (2) | 95.862% | 95.877% | 95.874% |
 | Random Forest (3) | 97.915%	| 97.926% | 97.837% |
-| Naive Bayes (1) | 38.75%	| NA | 38.56%|
-| Naive Bayes (2) | 38.74%	| NA | 38.56% |
-| Naive Bayes (3) | 42.76% | NA | 42.85% |
-| TF-IDF Naive Bayes | 49.29% | NA | 49.32% |
-| PCA Baseline | 79.69% | NA | 79.81% | 
-| PCA + XGBoost | 68.36% | NA | 68.39% |
-| PCA + Logistic Regression | 92.18% | NA | 92.16% |
+| Naive Bayes (1) | 38.75%	| N/A | 38.56%|
+| Naive Bayes (2) | 38.74%	| N/A | 38.56% |
+| Naive Bayes (3) | 42.76% | N/A | 42.85% |
+| TF-IDF Naive Bayes | 49.29% | N/A | 49.32% |
+| PCA Baseline | 79.69% | N/A | 79.81% | 
+| PCA + XGBoost | 68.36% | N/A | 68.39% |
+| PCA + Logistic Regression | 92.18% | N/A | 92.16% |
+
 ### Discussion
+Our initial model with the Random Forest approach performed badly, with greater than 95% error rate (i.e. lower than 5% prediction accuracy). This led us to explore different classification models such as Naive Bayes' along with different preprocessing method. The Naive Bayes' model was also distributed model, belonging to the `pyspark.ml` pacakge, and the supervised machine learning method provided us good insights as to why Model 1 performed poorly. We reasoned that the high error rate was due to imbalanced data, an extreme case where there were simply too many labels to choose from, such that the algorithm could not learn any apparent pattern. Thus, we limited the dataset so only the top 100 most populated subreddits are used to train the model. This lowered our error rate greaty, as one can see from the previous table. 
+
+Dimensionality reduction methods via PCA...
 
 ### Conclusion
 
 ### Statement of Collaboration
 |Name| Title| Contribution|
 |---|---|---|
-|Gloria Kao|Team Leader/Project Manager|x|
+|Gloria Kao|Team Leader/Project Manager|Organize GitHub repository, format code, edit README/written report|
 |Mahir Oza|Writer|x|
 |Ali Karim|Coder|x|
 |Michael Nodini|Coder|x|
 
-*Note: All Team Members had secondary contributions to each task - Title & Contributions listed pertain to primary tasks and majority functions performed*
+*Note: All Team Members had secondary contributions to each task - Title & Contributions listed pertain to primary tasks and majority functions performed.*
