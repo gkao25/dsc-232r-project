@@ -497,12 +497,43 @@ Dimensionality reduction methods via PCA...
 
 ### Conclusion
 
+The distributed Spark Decision Tree and Random Forest engines successfully ran across our
+massive preprocessed datasets on the SDSC Expanse cluster, though overall accuracy remained limited due to structural underfitting. High class nuance and overlapping target
+characteristics present clear challenges for classification from text features alone. However, this
+milestone successfully established a robust, distributed data preprocessing and modeling
+pipeline. Limiting classifications to the top 100 communities and incorporating unsupervised
+PCA transformations significantly reduced execution errors, with PCA + XGBoost yielding our
+top performance.
+
+Potential Systemic Improvements: 
+
+To further improve predictive accuracy, future
+configurations should mandate stratified splitting thresholds, ensuring every target subreddit has
+sufficient training observations. To improve model performance while maintaining dataset scale,
+we can refine feature definitions by focusing on the top 20 or 50 largest subreddits. Additionally,
+incorporating non-text metadata features—such as user account metrics, average subreddit
+member activity, or posting times—would introduce critical contextual signals. This would help
+the model find distinct patterns beyond overlapping text tokens.
+
+Big Data Processing Retrospective: 
+
+Leveraging parallel processing architectures to read,
+process, and train models on large datasets is a crucial requirement for web-scale applications.
+Splitting intensive computations across synchronized processing nodes drastically increases
+execution efficiency. This approach allows large workloads to run concurrently in fractions of the
+time required by sequential pipelines. Distributed frameworks like Apache Spark fundamentally
+transform our engineering methodology, turning massive, unmanageable datasets into highly
+scalable assets.
+
+NEED TO ADD: What we would explore next if given
+additional computational resources and timeline extensions,
+
 ### Statement of Collaboration
 |Name| Title| Contribution|
 |---|---|---|
 |Gloria Kao|Team Leader/Project Manager|Organize GitHub repository, format code, edit README/written report|
 |Mahir Oza|Writer|x|
 |Ali Karim|Coder|x|
-|Michael Nodini|Coder|x|
+|Michael Nodini|Coder|Communicated with teaching stuff about project issues, coded on expanse individually + shared screen when collaborating with group |
 
 *Note: All Team Members had secondary contributions to each task - Title & Contributions listed pertain to primary tasks and majority functions performed.*
