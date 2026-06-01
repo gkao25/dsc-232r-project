@@ -320,11 +320,12 @@ Across all 3 models, only 58-62% of the variance can be explained by the setups 
 | PCA + XGBoost | teenagers | 2007scape | False Negative (2007scape): Despite the prediction (`teenagers`) being wrong for the subreddit classification, we consider the predicted value (`teenagers`) the FP but the absence of the true value (`2007scape`) in this case is considered the FN because it was not selected as the estimate |
 
 ### Speedup Analysis
-| Executors | Time (sec) | Speedup | Efficiency |
-| --- | --- | --- | --- |
-| 1 | 8494.26 | 1.00x | 100% |
-| 4 | 6422.91 | 1.32x | 33.06% |
-| 7 | 6060.01 | 1.40x | 20.02% |
+| Executors | Memory/Exec | Time (sec) | Speedup | Efficiency |
+|-----------|--------------|-------------|----------|-------------|
+| 1 | 64GB | 8481.92 | 1.00x | 100.0% |
+| 4 | 24GB | 6422.91 | 1.32x | 33.0% |
+| 7 | 16GB | 6060.01 | 1.40x | 20.0% |
+| 15 | 6GB | 5964.49 | 1.42x | 9.5% |
 
 **Amdahl's Law:** 
 
