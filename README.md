@@ -587,7 +587,13 @@ To further improve predictive accuracy, future configurations should mandate str
 ### Big Data Processing Retrospective
 Leveraging parallel processing architectures to read, process, and train models on large datasets is a crucial requirement for web-scale applications. Splitting intensive computations across synchronized processing nodes drastically increases execution efficiency. This approach allows large workloads to run concurrently in fractions of the time required by sequential pipelines. Distributed frameworks like Apache Spark fundamentally transform our engineering methodology, turning massive, unmanageable datasets into highly scalable assets.
 
-NEED TO ADD: What we would explore next if given additional computational resources and timeline extensions,
+### Future What-Ifs
+There was additional reddit datasets from different dates that we could have incorporated into our analysis. A novel idea that we didn't touch on would be to see if we could predict the year a post was made in a given subreddit. For example, it would be interesting to see if we could classify the year or quarter a post was made in r/politics.
+
+We could have also tried grouping similar subreddits into categories and classified based on those. For example, advice subreddits, financial subreddits, sports subreddits, etc. If a post would be equally valid in two different advice subreddits it doesn't make sense to try to split that class while training our model.
+
+We could have also trained our model on additional features such as title and flair. We didn't think they were as important as the body text of the post but could have provided additional information to our models.
+
 
 ## Statement of Collaboration
 |Name| Title| Contribution|
