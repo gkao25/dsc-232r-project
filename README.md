@@ -12,8 +12,8 @@ Gloria Kao, Mahir Oza, Ali Karim, Michael Nodini
    - Preprocessing Description: [see below](#preprocessing-plan)
    - Model Evaluation: [see below](#distributed-model)
 4. Final Submission
-   - Code:
-   - Dimensionality Reduction: [see below](#dimensionality-reduction-model)
+   - Code: [speedup_analysis_PCA.ipynb](https://github.com/gkao25/dsc-232r-project/blob/main/speedup_analysis_PCA.ipynb)
+   - Dimensionality Reduction and Speedup Analysis: [see below](#dimensionality-reduction-model)
    - Written Report: [see below](#written-report)
 
 ## Abstract
@@ -374,7 +374,7 @@ The dataset we are using stitches together different periods of Reddit post info
 ![pca](visualization/pca_2.png)
 
 ## Methods
-Summary of methods employed.
+*Summary of methods employed. See notebooks linked in the Repo Directly for full code.*
 ### Data Exploration
 Data exploration included returning a breakdown of the total number of entries/posts within our dataset, which came down to 654,221,435 using 
 ```python
