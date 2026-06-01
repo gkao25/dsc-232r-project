@@ -266,7 +266,7 @@ We also can see that there are quite a bit of subreddits that have are incredibl
 **Dimension Reduced Model: Principal Component Analysis (PCA)**
 
 Implementation:
-*insert notebook*
+ [speedup_analysis_PCA.ipynb](https://github.com/gkao25/dsc-232r-project/blob/main/speedup_analysis_PCA.ipynb)
 
 ```python
 pyspark.ml.feature.PCA
