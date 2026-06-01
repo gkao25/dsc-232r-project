@@ -334,9 +334,9 @@ $$
 
 where for 7 executors:
 
-- \(S(n)\) = 1.40: speedup using \(n\) executors
-- \(P\) = parallelizable fraction of the workload
-- \(n\) = 7 number of executors
+- $S_{n}$ = 1.40: speedup using \(n\) executors
+- P = parallelizable fraction of the workload
+- n = 7 number of executors
 
 Solving for P (approximate):
 
