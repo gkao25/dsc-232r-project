@@ -428,6 +428,7 @@ that ultimately provided the following table:
 |NSFW_Tr-b-t-s|1217304|
 |d-rtyp-np-ls|1213695|
 |FreeKarma4You|1208657|
+
 *Note: NSFW subreddits have been altered*
 
 ### Preprocessing (Spark)
