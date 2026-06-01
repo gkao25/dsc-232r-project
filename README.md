@@ -516,6 +516,7 @@ from xgboost.spark import SparkXGBClassifier
 
 ## Results
 The following table shows the error rates of all the models we trained. Models of the same type but with different numbers indicate different hyperparameters were used. 
+### Error/Accuracy
 | Model | Training Error | Validation Error | Test Error |
 | --- | --- | --- | --- |
 | Random Forest (1) | 95.886% | 95.873% | 95.909% |
@@ -528,6 +529,19 @@ The following table shows the error rates of all the models we trained. Models o
 | PCA Baseline | 79.69% | N/A | 79.81% | 
 | PCA + XGBoost | 68.36% | N/A | 68.39% |
 | PCA + Logistic Regression | 92.18% | N/A | 92.16% |
+
+### Predictive Confusion Matrices Examples by Model
+**Model 1 (Random Forest)**
+|  | **Predicted Positive** | **Predicted Negative** |
+|---|---|---|
+| **Actual Positive** | Predicted `apexlegends` (AP/PP) post correctly | Determined `FashionReps` (AP) post correctly and did not predict `Advice` (PN) |
+| **Actual Negative** | Post was not `relationship_advice` (AN) but predicted `relationship_advice` (PP) | Post was not `Advice` (AN) and did not predict `FashionReps` (PN) |
+
+**Model 2 (PCA+XGBoost)**
+|  | **Predicted Positive** | **Predicted Negative** |
+|---|---|---|
+| **Actual Positive** | Predicted `ADHD` (AP/PP) post correctly | Determined `ADHD` (AP) post correctly and did not predict `PokemmonGoFriends` (PN) |
+| **Actual Negative** | Post was not `Advice` (AN) but predicted `2007scape` (PP) | Post was not `relationship_advice` (AN) and did not predict `teenagers` (PN) |
 
 
 ## Discussion
