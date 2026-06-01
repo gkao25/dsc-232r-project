@@ -346,18 +346,36 @@ $$
 
 This means that about $\frac{1}{3}$ of the workload is effectively parellizable while the other $\frac{2}{3}$ is controlled by overhead tasking. Looking for the max possible speedup with no excutor limit, $n\to\inf$, we see $S_{max} = \frac{3}{2}$ so that in theory we could achieve only 1.5x speedup at most based on the current context.
 
-## Written Report
+# Written Report
 
-### Introduction
+## Introduction
 As a group of students we find ourselves frequenting forum pages like Reddit in every day lives, whether that be for reasons such as academic help, asking for advice, or just finding a good recipe for dinner. Forums like these are incredibly important in bridging the gap of physical distances and bringing like minded people together as collaborative spaces of discussion in finding the help and understanding that we may require from our technologically online world. The problem: which communities and forums are right for the questions, help needed, and posts we have in mind? This problem has a fascinating ability to relate to all four of our group members with different interests, ideas, and experiences. It helped direct our project goals to develop a model that would help forum hosts in understanding its user's platform experience, and more importantly, assist users themselves to find the communities that best fit their interests and needs. Building an efficient predictive classifier would help forums like Reddit to identify aspects of their platform in areas such as subreddit suggestion so users can make posts or navigate through forums they find interesting. An accurate predictive model would also be useful for users to understand popular subreddits that would have a broader community to help them relate and find the most appropriate place to make posts that other users would frequent by knowing where that post should go. As online communities grow and people find it harder to navigate the environment, forum sites like Reddit become more important for users to feel connected. That is why it is important for them to expand their hosting capabilities to develop algorithms and models that serve the purposes of the platforms put forth -- to find people around the world that share their ideas, experiences, and interests.
 
 The dataset we are using stitches together different periods of Reddit post information such as the title, text, and subreddit, and when combined, they provides over 100GB of information. A dataset of this size is necessary to account for posts that may be more or less common during certain periods of time, and can help generalize by providing more data to train on for a potentially more accurate model. Processing and working with data at this scale is not feasible or scalable for modern everyday computers like the ones we use, and this is where distributed computing comes in. Using SDSC Expanse, we are able to leverage multiple cores of computer processors each allocated with a certain amount of memory all connected via a driver node. This improves the single-processor architecture where our data can be partitioned and worked on across multiple different nodes. Spark helps accomodate and support this structure, passing our data across these nodes so that we can process, understand, train, and evaluatre a dataset of this size despite the limitations of our everyday machines. Without Spark, it would be impossible to deal with these issues of sclability on any of our own one machines especialy in coordinating the work done by different nodes on various subsets of the dataset.
 
-### Figures
+## Figures
+### Data Exploration
+**Figure 1a and 1b:** Distribution of subreddits with less than 10 entries (very little entries) versus more than 3 entries (top quartile of subreddit entries count). These two plots help illustrate the imbalance in dataset, where certain subreddits dominate the data. 
 
-### Methods
+![subreddit_hist1](visualization/subreddit_hist1.png)
+![subreddit_hist2](visualization/subreddit_hist2.png)
+
+**Figure 2:** Pie chart illustrating the distribution of NSFW (18+) versus non-NSFW posts in the dataset. This indicates that while adult content is present, most Reddit posts fall under non-NSFW categories. However, the percentage of NSFW categories is still prevelant, so we decided to remove all entries that are labeled as over 18. 
+
+![text_pie](visualization/over18_pie.png)
+
+**Figure 3:** Pie chart illustrating the proportion of non-null verses null or removed `self_text`. This is the key feature that we use for our NLP classification task, so the pie chart is significant because it informs us that around 2/3 of our dataset is unusable and would be dropped form our dataset entirely.
+
+![text_pie](visualization/text_presence_pie.png)
+
+### PCA
+**Figure 4:** PCA explained variance by component. This plot is generated from a PCA + XGBoost model with 8 workers. 
+
+![pca](visualization/pca_2.png)
+
+## Methods
 Summary of methods employed.
-#### Data Exploration
+### Data Exploration
 Data exploration included returning a breakdown of the total number of entries/posts within our dataset, which came down to 654,221,435 using 
 ```python
 df.count()
@@ -412,7 +430,7 @@ that ultimately provided the following table:
 |FreeKarma4You|1208657|
 *Note: NSFW subreddits have been altered*
 
-#### Preprocessing (Spark)
+### Preprocessing (Spark)
 Our first step to preprocessing is filtering out the unwanted NSFW subreddit entries, and entries with empty or deleted post cotent. 
 ```python
 filtered_df = df.filter(col("over_18")==False)\
@@ -442,7 +460,7 @@ Finally, we encoded the `subreddit` label and drop all the unwanted features, ke
 pyspark.ml.feature.StringIndexer
 ```
 
-#### Model 1 (Random Forest)
+### Model 1 (Random Forest)
 We divided our filtered and preprocessed dataset into 70-15-15 for training, validation, and test sets. Our first distributed model was Random Forest:
 ```python
 from pyspark.ml.classification import DecisionTreeClassifier, RandomForestClassifier
@@ -464,7 +482,7 @@ rf_test_predictions = rf_model.transform(test_df)
 ```
 Evaluation results with different hyperparameters are listed in a later section.
 
-#### Model 1.5 (Naive Bayes')
+### Model 1.5 (Naive Bayes')
 We also explored building a Naive Bayes' model, which is commonly used for multinomial label classification problems like our project. 
 ```python
 pyspark.ml.classification.NaiveBayes
@@ -482,8 +500,8 @@ nb = NaiveBayes(featuresCol="features", labelCol="label", smoothing=0.1, modelTy
 pipeline = Pipeline(stages=[tokenizer, remover, hashingTF, label_indexer, nb])
 ```
 
-#### Model 2 (PCA with XGBoost)
-This model was built through a similar pipeline as Model 1.5, just with PCA added. Below shows all the packages used. 
+### Model 2 (PCA with XGBoost)
+This model was built through a similar pipeline as Model 1.5, just with PCA added. Below shows all the packages used.
 ```python
 from pyspark.ml.feature import (
     RegexTokenizer,
@@ -495,7 +513,7 @@ from pyspark.ml.feature import (
 from xgboost.spark import SparkXGBClassifier
 ```
 
-### Results
+## Results
 The following table shows the error rates of all the models we trained. Models of the same type but with different numbers indicate different hyperparameters were used. 
 | Model | Training Error | Validation Error | Test Error |
 | --- | --- | --- | --- |
@@ -510,57 +528,52 @@ The following table shows the error rates of all the models we trained. Models o
 | PCA + XGBoost | 68.36% | N/A | 68.39% |
 | PCA + Logistic Regression | 92.18% | N/A | 92.16% |
 
-The following scree plot illustrates the explained variance by PCA on a XGBoost model with 8 workers. The elbow point (where the line flattens out) is at 2 principle components, meaning the first two principle components are enough to explain the underlying data structure and all PCs to the left represent noise. 
-
-![pca](visualization/pca_2.png)
 
 ## Discussion
 
 ### Interpretation of Distributed Model Performance
-Our initial modeling attempts utilizing the Random Forest and Decision Tree approaches performed poorly, resulting in error rates ranging between 95% and 98% across the training, validation, and testing partitions. Because the performance metrics remained low and nearly identical across all data splits, this behavior is a clear indicator of systemic underfitting rather than overfitting. Underfitting occurs because tree-based architectures are inherently too simple to map complex linguistic patterns across a highly imbalanced dataset featuring millions of distinct target labels. Given that a minute 0.01% sample of the data alone contains 5,838 unique subreddits—many of which possess only a single entry—a 95% error rate still statistically outperforms a purely random baseline assignment model, which yields an accuracy probability of roughly 1/5838 or 0.00017.
+Our initial modeling attempts utilizing the Random Forest and Decision Tree approaches performed poorly, resulting in error rates ranging between 95% and 98% across the training, validation, and testing partitions. Because the performance metrics remained low and nearly identical across all data splits, this behavior is a clear indicator of systemic underfitting rather than overfitting. Underfitting occurs because tree-based architectures are inherently too simple to map complex linguistic patterns across a highly imbalanced dataset featuring millions of distinct target labels. Given that a minute 0.01% sample of the data alone contains 5,838 unique subreddits—many of which possess only a single entry — a 95% error rate still statistically outperforms a purely random baseline assignment model, which yields an accuracy probability of roughly 1/5838 or 0.00017.
 
-The subsequent introduction of the multinomial Naive Bayes' model proved that constraining the target label space to the top 100 most frequent subreddits significantly mitigates class imbalance, lowering our test error rate to approximately 38.56%. Adjusting hyperparameter constants, such as decreasing the smoothing coefficient from 1.0 to 0.1, failed to produce a significant impact on test errors, indicating that performance bottlenecks stem from the underlying composition of the text features rather than hyperparameter tuning.
+The subsequent multinomial Naive Bayes' model proved that constraining the target label space to the top 100 most frequent subreddits significantly mitigates class imbalance, lowering our test error rate to approximately 38.56%. However, adjusting hyperparameter constants such as decreasing the smoothing coefficient from 1.0 to 0.1, failed to produce a significant impact on test errors, indicating that performance bottlenecks stem from the underlying composition of the text features rather than hyperparameter tuning.
 
 ### Dimensionality Reduction and PCA Interpretation
 Incorporating unsupervised dimensionality reduction via Principal Component Analysis (PCA) yielded a substantial performance leap compared to the uncompressed Random Forest baselines, with the PCA + XGBoost model establishing our top configuration at a 68.39% testing error rate. Across all three evaluated PCA variations, the cumulative explained variance accounted for only 58% to 62% of the total dataset variance. This demonstrates a moderate preservation of original data structure, meaning that approximately 38% to 42% of the textual information space was discarded during linear compression. This information loss confirms that the underlying text data contains highly intricate, non-linear relationships that a standard linear PCA layer struggles to compress seamlessly without discarding discriminatory structures.
 
-Furthermore, analyzing the component vectors reveals that the first principal component (PC1) captures a disproportionately massive share of variance within the XGBoost (23.61%) and Logistic Regression (28.33%) pipelines compared to the subsequent nine components. This shows that the transformed text space becomes highly concentrated along a singular directional axis, reflecting heavy linguistic correlation, structural token redundancies, or compressed data alignment across features.
+Furthermore, Figure 4 "PCA Explained Variance by Component" shows that the elbow point (where the line flattens out) is at 2 principle components. This reveals that the first principal component (PC1) captures a disproportionately massive share of variance within the XGBoost (23.61%) and Logistic Regression (28.33%) pipelines compared to the subsequent nine components. This shows that the transformed text space becomes highly concentrated along a singular directional axis, reflecting heavy linguistic correlation, structural token redundancies, or compressed data alignment across features.
 
 
 ### Shortcomings and Model Believability
-A persistent bottleneck affecting classification believability is the extreme semantic and linguistic overlap shared among several of the top-performing subreddits[cite: 1]. For instance, forums such as `Advice` and `teenagers` naturally attract highly parallel vocabulary, syntactic choices, and subject matters because both communities serve as conversational environments where users seek guidance or discuss similar real-world problems. Because our feature sets rely strictly on text tokens from post titles and bodies, the model struggles to differentiate between these conceptually fluid boundaries, resulting in elevated false-positive and false-negative classifications[cite: 1]. 
+A persistent bottleneck affecting classification believability is the extreme semantic and linguistic overlap shared among several of the top-performing subreddits[cite: 1]. For instance, forums such as "Advice" and "teenagers" naturally attract highly parallel vocabulary, syntactic choices, and subject matters because both communities serve as conversational environments where users seek guidance or discuss similar real-world problems. Because our feature sets rely strictly on text tokens from post titles and body texts, the model struggles to differentiate between these conceptually fluid boundaries, resulting in elevated false-positive and false-negative classifications[cite: 1]. 
 
-Evaluating text-based mediums for subjective real-world environments demonstrates that high class nuance requires supplementary feature layers—such as user demographics, account metrics, or community sizing—to successfully isolate patterns beyond raw text constraints. It is completely expected in big data problems to encounter these limits, and criticizing these data gaps shows proper scientific thinking and intellectual merit as we prepare the final deliverable.
+Evaluating text-based mediums for subjective real-world environments demonstrates that high class nuance requires supplementary feature layers. For example, our dataset lacks features such as user demographics, account metrics, or community sizing to successfully isolate patterns beyond raw text. It is completely expected in big data problems to encounter these limits, and criticizing these data gaps shows proper scientific thinking and intellectual merit as we prepare the final deliverable.
 
 ### Critical Evaluation of Linear Compression and Classifier Interactions
-To evaluate the true "why" behind our dimensionality reduction pipeline and assess the scientific believability of our results, we must critically analyze our architectural choices. Applying Principal Component Analysis (PCA) to a high-dimensional, sparse token space (generated via HashingTF/TF-IDF) presents fundamental theoretical limitations. Textual data is inherently non-linear and sparse; words derive their meaning from context, syntax, and sequence. 
+To evaluate the true "why" behind our dimensionality reduction pipeline and assess the scientific believability of our results, we must critically analyze our architectural choices. Applying Principal Component Analysis (PCA) to a high-dimensional, sparse token space (generated via HashingTF/TF-IDF) presents fundamental theoretical limitations. Textual data is inherently non-linear and sparse because words derive their meaning from context, syntax, and sequence. 
 
 Linear PCA forces orthogonal, linear combinations of token frequencies to capture maximum variance. While this is effective at isolating broad, macro-level topical variations across posts, it struggles with the subtle nuances of language. By discarding 38% to 42% of the total dataset variance across our models, the compression layer effectively threw out rare but highly discriminative keywords that could uniquely identify closely related subreddits. This information loss directly caps the performance of any downstream model.
 
 This loss of structural nuance explains the stark contrast in test performance between our downstream classifiers:
 
-* **Multinomial Logistic Regression Failure:** Logistic Regression achieved our worst performance with an error rate of 92.16%. This failure stems from the model's rigid mathematical constraint: it attempts to construct purely linear hyperplanes to separate the 100 subreddit classes within the 10-dimensional PCA feature space. Because the projected principal components are highly overlapping and non-linearly distributed, a linear boundary is fundamentally incapable of separating the classes. 
-* **XGBoost Success:** In contrast, the SparkXGBClassifier achieved our optimal performance with a significantly lower test error rate of 68.39%. As an ensemble of gradient-boosted decision trees, XGBoost does not assume linearity. Instead, it constructs non-linear, orthogonal decision boundaries through sequential tree splitting. This architecture allows it to capture complex, multi-dimensional feature interactions between the principal components (e.g., modeling non-linear thresholds where specific combinations of PC1 and PC3 indicate a target community). 
+**Multinomial Logistic Regression Failure:** Logistic Regression achieved our worst performance with an error rate of 92.16%. This failure is due to the model's rigid mathematical constraint, as it attempts to construct purely linear hyperplanes to separate the 100 subreddit classes within the 10-dimensional PCA feature space. Because the projected principal components are highly overlapping and non-linearly distributed, a linear boundary is fundamentally incapable of separating the classes. 
+
+**XGBoost Success:** In contrast, the SparkXGBClassifier achieved our optimal performance with a significantly lower test error rate of 68.39%. As an ensemble of gradient-boosted decision trees, XGBoost does not assume linearity. Instead, it constructs non-linear decision boundaries through sequential tree splitting. This architecture allows it to capture complex, multi-dimensional feature interactions between the principal components (e.g., modeling non-linear thresholds where specific combinations of PC1 and PC3 indicate a target community). 
 
 While a 68.39% error rate demonstrates that the problem is far from perfectly solved, criticizing these shortcomings highlights the intellectual merit of our engineering pipeline. It proves that while linear dimensionality reduction provides massive computational speedups, a non-linear classifier framework is absolutely necessary to navigate the compressed feature spaces of natural language.
 
-#
 
-Dimensionality reduction methods via PCA...
+## Conclusion
 
-### Conclusion
+The distributed Spark Decision Tree and Random Forest engines successfully ran across our massive preprocessed datasets on the SDSC Expanse cluster, though overall accuracy remained limited due to structural underfitting. High class nuance and overlapping target characteristics present clear challenges for classification from text features alone. However, this milestone successfully established a robust, distributed data preprocessing and modeling pipeline. Limiting classifications to the top 100 communities and incorporating unsupervised PCA transformations significantly reduced execution errors, with PCA + XGBoost yielding our top performance.
 
-The distributed Spark Decision Tree and Random Forest engines successfully ran across ourmassive preprocessed datasets on the SDSC Expanse cluster, though overall accuracy remained limited due to structural underfitting. High class nuance and overlapping target characteristics present clear challenges for classification from text features alone. However, this milestone successfully established a robust, distributed data preprocessing and modeling pipeline. Limiting classifications to the top 100 communities and incorporating unsupervised PCA transformations significantly reduced execution errors, with PCA + XGBoost yielding our top performance.
+### Potential Systemic Improvements
+To further improve predictive accuracy, future configurations should mandate stratified splitting thresholds, ensuring every target subreddit has sufficient training observations. To improve model performance while maintaining dataset scale, we can refine feature definitions by focusing on the top 20 or 50 largest subreddits. Additionally, incorporating non-text metadata features—such as user account metrics, average subreddit member activity, or posting times—would introduce critical contextual signals. This would help the model find distinct patterns beyond overlapping text tokens.
 
-**Potential Systemic Improvements:** To further improve predictive accuracy, future configurations should mandate stratified splitting thresholds, ensuring every target subreddit has
-sufficient training observations. To improve model performance while maintaining dataset scale, we can refine feature definitions by focusing on the top 20 or 50 largest subreddits. Additionally, incorporating non-text metadata features—such as user account metrics, average subreddit member activity, or posting times—would introduce critical contextual signals. This would help the model find distinct patterns beyond overlapping text tokens.
+### Big Data Processing Retrospective
+Leveraging parallel processing architectures to read, process, and train models on large datasets is a crucial requirement for web-scale applications. Splitting intensive computations across synchronized processing nodes drastically increases execution efficiency. This approach allows large workloads to run concurrently in fractions of the time required by sequential pipelines. Distributed frameworks like Apache Spark fundamentally transform our engineering methodology, turning massive, unmanageable datasets into highly scalable assets.
 
-**Big Data Processing Retrospective:** Leveraging parallel processing architectures to read, process, and train models on large datasets is a crucial requirement for web-scale applications. Splitting intensive computations across synchronized processing nodes drastically increases execution efficiency. This approach allows large workloads to run concurrently in fractions of the time required by sequential pipelines. Distributed frameworks like Apache Spark fundamentally transform our engineering methodology, turning massive, unmanageable datasets into highly scalable assets.
+NEED TO ADD: What we would explore next if given additional computational resources and timeline extensions,
 
-NEED TO ADD: What we would explore next if given
-additional computational resources and timeline extensions,
-
-### Statement of Collaboration
+## Statement of Collaboration
 |Name| Title| Contribution|
 |---|---|---|
 |Gloria Kao|Team Leader/Project Manager|Organized GitHub repository, formated code, edited README/written report, arranged out meeting times, ensured project deadlines and requirements met, worked on determining process, communicated with instructors, and provided feedback on code/writeup|
