@@ -510,6 +510,10 @@ The following table shows the error rates of all the models we trained. Models o
 | PCA + XGBoost | 68.36% | N/A | 68.39% |
 | PCA + Logistic Regression | 92.18% | N/A | 92.16% |
 
+The following scree plot illustrates the explained variance by PCA on a XGBoost model with 8 workers. The elbow point (where the line flattens out) is at 2 principle components, meaning the first two principle components are enough to explain the underlying data structure and all PCs to the left represent noise. 
+
+![pca](visualization/pca_2.png)
+
 ### Discussion
 Our initial model with the Random Forest approach performed badly, with greater than 95% error rate (i.e. lower than 5% prediction accuracy). This led us to explore different classification models such as Naive Bayes' along with different preprocessing method. The Naive Bayes' model was also distributed model, belonging to the `pyspark.ml` pacakge, and the supervised machine learning method provided us good insights as to why Model 1 performed poorly. We reasoned that the high error rate was due to imbalanced data, an extreme case where there were simply too many labels to choose from, such that the algorithm could not learn any apparent pattern. Thus, we limited the dataset so only the top 100 most populated subreddits are used to train the model. This lowered our error rate greaty, as one can see from the previous table. 
 
@@ -517,33 +521,12 @@ Dimensionality reduction methods via PCA...
 
 ### Conclusion
 
-The distributed Spark Decision Tree and Random Forest engines successfully ran across our
-massive preprocessed datasets on the SDSC Expanse cluster, though overall accuracy remained limited due to structural underfitting. High class nuance and overlapping target
-characteristics present clear challenges for classification from text features alone. However, this
-milestone successfully established a robust, distributed data preprocessing and modeling
-pipeline. Limiting classifications to the top 100 communities and incorporating unsupervised
-PCA transformations significantly reduced execution errors, with PCA + XGBoost yielding our
-top performance.
+The distributed Spark Decision Tree and Random Forest engines successfully ran across ourmassive preprocessed datasets on the SDSC Expanse cluster, though overall accuracy remained limited due to structural underfitting. High class nuance and overlapping target characteristics present clear challenges for classification from text features alone. However, this milestone successfully established a robust, distributed data preprocessing and modeling pipeline. Limiting classifications to the top 100 communities and incorporating unsupervised PCA transformations significantly reduced execution errors, with PCA + XGBoost yielding our top performance.
 
-Potential Systemic Improvements: 
+**Potential Systemic Improvements:** To further improve predictive accuracy, future configurations should mandate stratified splitting thresholds, ensuring every target subreddit has
+sufficient training observations. To improve model performance while maintaining dataset scale, we can refine feature definitions by focusing on the top 20 or 50 largest subreddits. Additionally, incorporating non-text metadata features—such as user account metrics, average subreddit member activity, or posting times—would introduce critical contextual signals. This would help the model find distinct patterns beyond overlapping text tokens.
 
-To further improve predictive accuracy, future
-configurations should mandate stratified splitting thresholds, ensuring every target subreddit has
-sufficient training observations. To improve model performance while maintaining dataset scale,
-we can refine feature definitions by focusing on the top 20 or 50 largest subreddits. Additionally,
-incorporating non-text metadata features—such as user account metrics, average subreddit
-member activity, or posting times—would introduce critical contextual signals. This would help
-the model find distinct patterns beyond overlapping text tokens.
-
-Big Data Processing Retrospective: 
-
-Leveraging parallel processing architectures to read,
-process, and train models on large datasets is a crucial requirement for web-scale applications.
-Splitting intensive computations across synchronized processing nodes drastically increases
-execution efficiency. This approach allows large workloads to run concurrently in fractions of the
-time required by sequential pipelines. Distributed frameworks like Apache Spark fundamentally
-transform our engineering methodology, turning massive, unmanageable datasets into highly
-scalable assets.
+**Big Data Processing Retrospective:** Leveraging parallel processing architectures to read, process, and train models on large datasets is a crucial requirement for web-scale applications. Splitting intensive computations across synchronized processing nodes drastically increases execution efficiency. This approach allows large workloads to run concurrently in fractions of the time required by sequential pipelines. Distributed frameworks like Apache Spark fundamentally transform our engineering methodology, turning massive, unmanageable datasets into highly scalable assets.
 
 NEED TO ADD: What we would explore next if given
 additional computational resources and timeline extensions,
@@ -551,7 +534,7 @@ additional computational resources and timeline extensions,
 ### Statement of Collaboration
 |Name| Title| Contribution|
 |---|---|---|
-|Gloria Kao|Team Leader/Project Manager|Organize GitHub repository, format code, edit README/written report, figure out meeting times, ensure project deadlines and requirements met, worked on determining process, communicated with instructors, and provided feedback on code/writeup|
+|Gloria Kao|Team Leader/Project Manager|Organized GitHub repository, formated code, edited README/written report, arranged out meeting times, ensured project deadlines and requirements met, worked on determining process, communicated with instructors, and provided feedback on code/writeup|
 |Mahir Oza|Writer|Formatted README, wrote up analysis, justified actions, communicated with instructors, reviewed code with feedback, determined modeling process, analyzed model results, wrote up conclusion, looked over visualizations for important, and put together tables/graphs|
 |Ali Karim|Coder|Wrote up code for Models 1 & 2, performed EDA and processing, created graphs, and outputted table results, communicated with instructors, unsupervised learning around dimensionality reduction, provided feedback and writeup, vectorized posts, and conducted speed up tests|
 |Michael Nodini|Coder|Processed data, worked on EDA, determined optimal core/executor setup, created Naive-Bayes model, provided writeup feedback, transformed text based posts, worked to ensure running of Model 1 & 2, and communicated with instructors|
