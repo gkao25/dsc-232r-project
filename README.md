@@ -305,12 +305,12 @@ Across all 3 models, only 58-62% of the variance can be explained by the setups 
 
 **Potential Improvements/Additional Models:** For these models the first thing that continues to standout is that models are struggling to predict from the large set of subreddit options. Despite cutting down to the top 100 subreddits, while our model did perform slightly better, it is clear that there are still too many options for the model to predict a subreddit. A potential improvement on this would be to cut down instead to only the top 20 subreddits to better aid the model by simplifying the options it has to pick from. Additionally another problem we continue to see as a pattern is that too many of the top subreddits are very similar or include similar posts. For example, subreddits like Advice and teenagers often have similar posts serving as forum spaces for users to gather for questions and help in navigating similar issues that are discussed in both environments. We continue to see that many of these top performing subreddits serve similar forum purposes that are going to continue making it difficult for the models to predict based just off posts. Since posts are so similar for these subreddits in many of the key words used, it would be helpful to have additional levels of features to help narrow down subreddits, such as common subreddits frequented by the user posting, user characteristics (personal information, preferences, account age, etc.), or subreddit size. Additional features like this would better help find patterns to tie subreddits to more specific sets of feature combinations/interactions that help identify more sensitive aspects in subreddit classification. 
 
-**Effect of Dimensionality Reduction:** The primary strengths of dimensionality reduction led to faster model training along with allowing our model to focus on the most important feature values. This allows more prominent patterns and trends to stand out and be highlighted across the model inputs while throwing aspects of the different posts that would be unhelpful to the side since they offer no benefit to the model training other than being additional, unusable information. 
+**Effect of Dimensionality Reduction:** The primary strengths of dimensionality reduction led to faster model training along with allowing our model to focus on the most important feature values. This allows more prominent patterns and trends to stand out and be highlighted across the model inputs while throwing aspects of the different posts that would be unhelpful to the side since they offer no benefit to the model training other than being additional, unusable information. We see that compared to the full feature set used during Model 1's Random Forest approach, by filtering down to the most imporant parts of the feature set, our model was able to improve in its accuracy from an error rate of about 95% to an error rate in our best PCA model of approximately 68%. It's important to note that the distributed model performed very bad from an objective perspective essentially selecting every 1 in 20 posts correctly, so even though the dimensionality reduction performed vastly better it also was not ideal selecting approximately every 1 in 3 posts correctly. This framing, however, still shows just how much more powerful our dimensionality reduced model is able to perform when taking out superflous pieces of data that contribute minimally to subreddit determination. 
 
 ### Conclusion
 **2nd Model:** Our second set of models performed far greater than the distributed Random Forest models we implemented. Despite the hyperparameters for the Random Forest models, we saw very large predictive inaccuracies setting the error between 95-98% for both training and test errors. In contrast, while the dimensionality reduced, PCA, models didn't perform ideally, they were significantly better performing with an error rate between 68-93%. Particulary, we saw the best performance by the PCA/XGBoost model type that had an error rate around 68%. Not too far off was the Baseline PCA model which had an error rate of about 79%, showing much greater predctive capability than the Random Forest models we built earlier. This comparative improvement from the Random Forest models to the PCA models can be attributed to the dimensionality reduction focusing our models efforts on the terms and features that mattered most to a post and thus allowed greater accuracy in predicting subreddits.
 
-**Improvements:** Try different parameter sets.
+**Improvements:** The obvious improvement we could make to have a more accurate model would be testing out different parameter sets that could potentially improve our PCA models. More specificically, working to try different things with our PCA models parameters and the XGBoost implementation would be the ideal path forward since that was the best model from the 3 PCA iterations we conducted. A more daring approach would perhaps be to narrow down from the top 100 subreddits to the top 20 or 50. This would help simplify the models approach slightly by giving it fewer subreddit options to have to determine from although it further remove our models ability to generalize to more niche subreddit posts and even some subreddits that while still being popular do lie outside the top 20 or 50 most popular forums. Additionally, we could work to generalize similar subreddits by going through the top 100 subreddits and considering forums that likely have the same purposes/post (or most FP/FN crossover) to all fall under the same subreddit type or umbrella. For example, something like `relationship_advice` and `Advice` likely have similar posts and could be generalized under the `Advice` subreddit umbrella. 
 
 ### Prediction Analysis
 | Model Type | Prediction | Truth | Prediction Type/Justification |
@@ -325,6 +325,26 @@ Across all 3 models, only 58-62% of the variance can be explained by the setups 
 | 1 | 8494.26 | 1.00x | 100% |
 | 4 | 6422.91 | 1.32x | 33.06% |
 | 7 | 6060.01 | 1.40x | 20.02% |
+
+**Amdahl's Law:** 
+
+$$
+S(n) = \frac{1}{(1 - P) + \frac{P}{n}}
+$$
+
+where for 7 executors:
+
+- \(S(n)\) = 1.40: speedup using \(n\) executors
+- \(P\) = parallelizable fraction of the workload
+- \(n\) = 7 number of executors
+
+Solving for P (approximate):
+
+$$
+P = \frac{1}{3}
+$$
+
+This means that about $\frac{1}{3}$ of the workload is effectively parellizable while the other $\frac{2}{3}$ is controlled by overhead tasking. Looking for the max possible speedup with no excutor limit, $n\to\inf$, we see $S_{max} = \frac{3}{2}$ so that in theory we could achieve only 1.5x speedup at most based on the current context.
 
 ## Written Report
 
@@ -531,9 +551,9 @@ additional computational resources and timeline extensions,
 ### Statement of Collaboration
 |Name| Title| Contribution|
 |---|---|---|
-|Gloria Kao|Team Leader/Project Manager|Organize GitHub repository, format code, edit README/written report|
-|Mahir Oza|Writer|x|
-|Ali Karim|Coder|x|
-|Michael Nodini|Coder|Communicated with teaching stuff about project issues, coded on expanse individually + shared screen when collaborating with group |
+|Gloria Kao|Team Leader/Project Manager|Organize GitHub repository, format code, edit README/written report, figure out meeting times, ensure project deadlines and requirements met, worked on determining process, communicated with instructors, and provided feedback on code/writeup|
+|Mahir Oza|Writer|Formatted README, wrote up analysis, justified actions, communicated with instructors, reviewed code with feedback, determined modeling process, analyzed model results, wrote up conclusion, looked over visualizations for important, and put together tables/graphs|
+|Ali Karim|Coder|Wrote up code for Models 1 & 2, performed EDA and processing, created graphs, and outputted table results, communicated with instructors, unsupervised learning around dimensionality reduction, provided feedback and writeup, vectorized posts, and conducted speed up tests|
+|Michael Nodini|Coder|Processed data, worked on EDA, determined optimal core/executor setup, created Naive-Bayes model, provided writeup feedback, transformed text based posts, worked to ensure running of Model 1 & 2, and communicated with instructors|
 
-*Note: All Team Members had secondary contributions to each task - Title & Contributions listed pertain to primary tasks and majority functions performed.*
+*Note: All Team Members had secondary contributions to each task type - Title & Contributions listed pertain to primary tasks and majority functions performed.*
